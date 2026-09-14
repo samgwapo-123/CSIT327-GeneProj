@@ -1,0 +1,71 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Home - GeneRX</title>
+    <link rel="stylesheet" href="{% static 'css/home/home.css' %}">
+</head>
+<body>
+<div class="container genrx-home">
+
+    <!-- Top bar -->
+    <div class="genrx-top">
+        <div class="menu-btn">☰</div>
+        <div class="nav-links">
+            <a href="{% url 'user_profile:profile' %}">Profile</a>
+            <a href="{% url 'user_settings:settings' %}">Settings</a>
+            <a href="{% url 'login:logout' %}">Logout</a>
+            <div class="avatar">{{ username|slice:":1"|upper }}</div>
+        </div>
+    </div>
+
+    <!-- Greeting -->
+    <div class="greeting-block">
+        <h1>Hey {{ username }}!</h1>
+        <p class="greeting-sub">Find your generic medicine</p>
+    </div>
+
+    <!-- Search / Scan card -->
+    <div class="search-card">
+        <div class="card-header">
+            <div class="card-icon-circle">🔍</div>
+            <span class="card-title">Medicine Lookup</span>
+        </div>
+
+        <div class="action-row">
+            <div class="action-btn active" id="searchTab" onclick="showTab('search')">Search Medicine</div>
+            <div class="action-btn" id="scanTab" onclick="showTab('scan')">Scan Medicine</div>
+        </div>
+
+        <div class="search-panel" id="searchPanel">
+            <input type="text" id="medicineSearch" placeholder="Type a brand name, e.g. Biogesic..." oninput="handleSearch()">
+        </div>
+
+        <div class="scan-panel hidden" id="scanPanel">
+            <span class="icon">📷</span>
+            Camera scan (OCR) is coming soon.<br>Use Search Medicine for now.
+        </div>
+    </div>
+
+    <!-- Results -->
+    <p class="section-label" id="resultsLabel">Type a medicine name above</p>
+    <div id="resultsArea">
+        <div class="empty-state">Try "Biogesic" or "Coumadin"</div>
+    </div>
+
+    <!-- Generic alternatives detail view -->
+    <div id="detailArea" class="hidden">
+        <div class="detail-header">
+            <button class="back-btn" onclick="backToResults()">←</button>
+            <span class="detail-title" id="detailTitle"></span>
+        </div>
+        <p class="detail-sub" id="detailSub"></p>
+        <p class="section-label">Generic Alternatives</p>
+        <div class="generic-list" id="genericList"></div>
+    </div>
+
+</div>
+<script src="{% static 'js/home/home.js' %}"></script>
+</body>
+</html>

@@ -1,0 +1,99 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - GeneRX</title>
+    <!-- ?v=2 forces browser to clear the old cache -->
+    <link rel="stylesheet" href="{% static 'css/user_settings/settings.css' %}?v=2">
+</head>
+<body>
+    <div class="container">
+        <!-- Top App Bar (Identical to Homescreen) -->
+        <div class="genrx-top">
+            <a href="{% url 'home:home' %}" class="menu-btn" title="Back to Home">←</a>
+            <div class="nav-links">
+                <a href="{% url 'user_profile:profile' %}">Profile</a>
+                <a href="{% url 'home:home' %}">Home</a>
+                <a href="{% url 'login:logout' %}">Logout</a>
+                <div class="avatar">{{ request.user.username|slice:":1"|upper }}</div>
+            </div>
+        </div>
+
+        <!-- Header Block (Identical to 'Hey Test_123!') -->
+        <div class="greeting-block">
+            <h1>Settings</h1>
+            <p class="greeting-sub">PREFERENCES & CONTROLS</p>
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <!-- Inner Card 1: Medicine Preferences -->
+            <div class="inner-card">
+                <div class="card-header">
+                    <div class="card-icon-circle">💊</div>
+                    <div class="card-title">Medicine Lookup & Safety</div>
+                </div>
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <span class="setting-name">Prioritize Generics</span>
+                        <span class="setting-desc">Highlight affordable generic equivalents first</span>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" name="prefer_generics" {% if settings.prefer_generics %}checked{% endif %}>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <span class="setting-name">NTI Safety Warnings</span>
+                        <span class="setting-desc">Alert for Narrow Therapeutic Index medicines</span>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" name="nti_warnings" {% if settings.nti_warnings %}checked{% endif %}>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Inner Card 2: App & Notifications -->
+            <p class="section-label">DISPLAY & NOTIFICATIONS</p>
+            <div class="inner-card">
+                <div class="card-header">
+                    <div class="card-icon-circle">⚙️</div>
+                    <div class="card-title">General Preferences</div>
+                </div>
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <span class="setting-name">Dark Mode</span>
+                        <span class="setting-desc">Adjust display for low-light environments</span>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" name="dark_mode" {% if settings.dark_mode %}checked{% endif %}>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <span class="setting-name">Email Notifications</span>
+                        <span class="setting-desc">Receive updates about medicine price changes</span>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" name="email_notifications" {% if settings.email_notifications %}checked{% endif %}>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Submit Button (Matches 'Search Medicine' Button) -->
+            <button type="submit" class="action-btn-main">Save Changes</button>
+        </form>
+    </div>
+</body>
+</html>

@@ -1,0 +1,365 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 40px 16px;
+    background: radial-gradient(circle at 30% 20%, #2fb8b3, #0f6e72 70%);
+    background-attachment: fixed;
+    color: #333;
+}
+
+/* --- The Main White "Square / Frame" Container --- */
+.container {
+    width: 440px;
+    max-width: 100%;
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 26px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+    padding: 28px 24px;
+    text-align: left;
+    position: relative;
+    z-index: 2;
+}
+
+.genrx-home * {
+    box-sizing: border-box;
+}
+
+/* --- Top Navigation --- */
+.genrx-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 22px;
+}
+
+.menu-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: #f4fbfb;
+    border: 1px solid rgba(15, 110, 114, 0.12);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    color: #0f6e72;
+    cursor: pointer;
+    transition: transform 0.2s ease, background 0.2s ease;
+}
+.menu-btn:hover {
+    background: #fff;
+    transform: translateY(-1px);
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.nav-links a {
+    color: #0f6e72;
+    font-size: 12px;
+    font-weight: bold;
+    text-decoration: none;
+    background: #f4fbfb;
+    border: 1px solid rgba(15, 110, 114, 0.12);
+    padding: 9px 13px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    transition: all 0.2s ease;
+}
+.nav-links a:hover {
+    background: #fff;
+    border-color: #0f6e72;
+    transform: translateY(-1px);
+}
+
+.avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #1a9296, #0f6e72);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 15px;
+    box-shadow: 0 4px 12px rgba(15, 110, 114, 0.3);
+}
+
+/* --- Greeting --- */
+.greeting-block {
+    margin-bottom: 20px;
+}
+.greeting-block h1 {
+    font-size: 24px;
+    color: #222;
+    margin: 0 0 3px 0;
+    font-weight: 700;
+    letter-spacing: -0.2px;
+}
+.greeting-sub {
+    font-size: 11px;
+    letter-spacing: 0.8px;
+    color: #888;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin: 0;
+}
+
+/* --- Cards Inside The Container --- */
+.search-card,
+.result-list,
+.generic-list,
+.empty-state {
+    background: #ffffff;
+    border: 1px solid #eef2f5;
+    border-radius: 18px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+    padding: 18px;
+    margin-bottom: 18px;
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+.card-icon-circle {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #1a9296, #0f6e72);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+}
+.card-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+}
+
+/* --- Action Buttons (Search / Scan toggle) --- */
+.action-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 14px;
+}
+.action-btn {
+    flex: 1;
+    text-align: center;
+    padding: 10px 6px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    background: #fcfdfe;
+    color: #666;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.action-btn:hover {
+    background: #f1f5f9;
+}
+.action-btn.active {
+    background: linear-gradient(135deg, #1a9296, #0f6e72);
+    border-color: transparent;
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(15, 110, 114, 0.25);
+}
+
+/* --- Input Field --- */
+.search-panel input {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 13px;
+    box-sizing: border-box;
+    outline: none;
+    transition: border-color 0.2s;
+    background: #fcfdfe;
+}
+.search-panel input:focus {
+    border-color: #1a9296;
+    background: #fff;
+}
+
+/* --- Scan Panel --- */
+.scan-panel {
+    border: 2px dashed #b2dfdb;
+    border-radius: 12px;
+    padding: 22px 14px;
+    text-align: center;
+    color: #666;
+    font-size: 12px;
+    background: #f4fbfb;
+}
+.scan-panel .icon {
+    font-size: 24px;
+    display: block;
+    margin-bottom: 6px;
+    color: #0f6e72;
+}
+
+.hidden {
+    display: none;
+}
+
+/* --- Section Labels --- */
+.section-label {
+    color: #718096;
+    font-size: 11px;
+    font-weight: bold;
+    letter-spacing: 0.8px;
+    margin: 12px 0 8px 4px;
+    text-transform: uppercase;
+}
+
+/* --- Results List --- */
+.result-list,
+.generic-list {
+    padding: 4px 16px;
+}
+.result-card,
+.generic-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 0;
+    border-bottom: 1px solid #edf2f7;
+    cursor: pointer;
+    transition: transform 0.15s ease;
+}
+.result-card:last-child,
+.generic-card:last-child {
+    border-bottom: none;
+}
+.result-card:hover {
+    transform: translateX(3px);
+}
+.generic-card {
+    cursor: default;
+}
+
+.pill-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    flex-shrink: 0;
+    background: linear-gradient(135deg, #1a9296, #0f6e72);
+}
+.pill-icon.otc {
+    background: linear-gradient(135deg, #f39c12, #d35400);
+}
+.pill-icon.warn {
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+}
+
+.med-info {
+    flex: 1;
+}
+.med-info .brand-name {
+    font-size: 14px;
+    font-weight: bold;
+    color: #2d3748;
+    display: block;
+}
+.med-info .generic-name {
+    font-size: 11px;
+    color: #718096;
+    margin: 2px 0 0 0;
+}
+.med-info .price {
+    font-size: 12px;
+    color: #0f6e72;
+    font-weight: bold;
+    margin: 3px 0 0 0;
+}
+
+/* --- Badges --- */
+.badge-small {
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-weight: bold;
+    white-space: nowrap;
+}
+.badge-small.rx {
+    background: #fdecea;
+    color: #c0392b;
+}
+.badge-small.otc {
+    background: #e6f7f3;
+    color: #0f6e72;
+}
+
+.nti-note {
+    font-size: 10px;
+    color: #c0392b;
+    margin-top: 2px;
+}
+.chevron {
+    color: #bbb;
+    font-size: 16px;
+}
+.empty-state {
+    text-align: center;
+    color: #888;
+    font-size: 13px;
+    padding: 24px 8px;
+}
+
+/* --- Details View --- */
+.detail-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 6px;
+}
+.back-btn {
+    background: #f4fbfb;
+    border: 1px solid rgba(15, 110, 114, 0.12);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    color: #0f6e72;
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+.back-btn:hover {
+    background: #fff;
+    transform: translateY(-1px);
+}
+.detail-title {
+    color: #2d3748;
+    font-size: 16px;
+    font-weight: 600;
+}
+.detail-sub {
+    color: #718096;
+    font-size: 11px;
+    margin: -2px 0 14px 46px;
+}

@@ -1,0 +1,106 @@
+* { box-sizing: border-box; }
+
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: radial-gradient(circle at 30% 20%, #2fb8b3, #0f6e72 70%);
+    position: relative;
+    overflow: hidden;
+}
+
+.bg-circle {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.10);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255,255,255,0.85);
+    font-size: 34px;
+}
+.bg-circle.c1 { width: 140px; height: 140px; top: 8%; left: 6%; font-size: 46px; }
+.bg-circle.c2 { width: 90px; height: 90px; top: 10%; left: 46%; font-size: 30px; }
+.bg-circle.c3 { width: 170px; height: 170px; bottom: 8%; right: 6%; font-size: 54px; }
+
+.container {
+    position: relative;
+    z-index: 2;
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(6px);
+    padding: 40px 44px;
+    border-radius: 24px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+    width: 360px;
+    text-align: center;
+}
+
+.logo-icon {
+    width: 56px;
+    height: 56px;
+    margin: 0 auto 14px auto;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #1a9296, #0f6e72);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+}
+
+h1 {
+    color: #333;
+    font-size: 24px;
+    margin: 0 0 26px 0;
+    font-weight: 600;
+}
+
+.field { position: relative; margin-bottom: 22px; text-align: left; }
+label {
+    display: block;
+    color: #0f6e72;
+    font-weight: bold;
+    font-size: 12px;
+    margin-bottom: 6px;
+}
+input {
+    width: 100%;
+    padding: 6px 26px 8px 0;
+    border: none;
+    border-bottom: 1.5px solid #ddd;
+    background: transparent;
+    font-size: 14px;
+    outline: none;
+}
+input:focus { border-bottom-color: #1a9296; }
+.field-icon {
+    position: absolute;
+    right: 0;
+    bottom: 8px;
+    color: #aaa;
+    font-size: 15px;
+}
+
+button {
+    width: 100%;
+    background: linear-gradient(135deg, #1a9296, #0f6e72);
+    color: #fff;
+    border: none;
+    padding: 13px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    margin-top: 8px;
+}
+button:hover { opacity: 0.92; }
+
+.error-msg { color: #c0392b; font-size: 13px; margin-bottom: 10px; }
+
+.link-row { margin-top: 22px; font-size: 13px; color: #666; }
+.link-row a { color: #0f6e72; text-decoration: none; font-weight: bold; }
+.link-row a:hover { text-decoration: underline; }
