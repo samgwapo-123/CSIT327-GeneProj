@@ -36,6 +36,10 @@ INSTALLED_APPS = [
     'apps.home',
     'apps.user_profile',
     'apps.user_settings',
+
+    'apps.medicines',
+    'apps.pharmacies',
+    'apps.scans',
 ]
 
 MIDDLEWARE = [
