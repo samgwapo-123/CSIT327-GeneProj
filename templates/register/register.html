@@ -16,25 +16,32 @@
         <div class="logo-icon">✚</div>
         <h1>Create Account!</h1>
 
-        {% if error %}
-            <p class="error-msg">{{ error }}</p>
+        {% if errors %}
+            {% for error in errors %}
+                <p class="error-msg">{{ error }}</p>
+            {% endfor %}
         {% endif %}
 
         <form method="post">
             {% csrf_token %}
             <div class="field">
                 <label>Username</label>
-                <input type="text" name="username" placeholder="Choose a username" required>
+                <input type="text" name="username" placeholder="Choose a username" value="{{ username }}" required>
                 <span class="field-icon"></span>
             </div>
             <div class="field">
                 <label>Email</label>
-                <input type="email" name="email" placeholder="Enter your email" required>
+                <input type="email" name="email" placeholder="Enter your email" value="{{ email }}" required>
                 <span class="field-icon"></span>
             </div>
             <div class="field">
                 <label>Password</label>
                 <input type="password" name="password" placeholder="Create a password" required>
+                <span class="field-icon"></span>
+            </div>
+            <div class="field">
+                <label>Confirm Password</label>
+                <input type="password" name="confirm_password" placeholder="Type the password again" required>
                 <span class="field-icon"></span>
             </div>
             <button type="submit">SIGN UP</button>
