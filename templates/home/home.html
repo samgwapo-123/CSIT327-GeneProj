@@ -3,69 +3,112 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home - GeneRX</title>
+    <link rel="stylesheet" href="{% static 'css/shared/theme.css' %}">
     <link rel="stylesheet" href="{% static 'css/home/home.css' %}">
 </head>
-<body>
-<div class="container genrx-home">
+<body class="genrx{% if genrx_settings.dark_mode %} dark-mode{% endif %}">
+<div class="genrx-shell">
 
-    <!-- Top bar -->
-    <div class="genrx-top">
-        <div class="menu-btn">☰</div>
-        <div class="nav-links">
+    <header class="genrx-top">
+        <a class="genrx-brand" href="{% url 'home:home' %}">
+            <span class="genrx-brand-mark" aria-hidden="true">Rx</span>
+            <span>
+                <span class="genrx-brand-name">GeneRX</span>
+                <span class="genrx-brand-tag">Generic medicine finder</span>
+            </span>
+        </a>
+
+        <nav class="genrx-nav" aria-label="Main navigation">
+            <a href="{% url 'home:home' %}" class="is-current" aria-current="page">Search</a>
+            <a href="{% url 'pharmacies:list' %}">Pharmacies</a>
+            <a href="{% url 'scans:scan' %}">Scan</a>
             <a href="{% url 'user_profile:profile' %}">Profile</a>
             <a href="{% url 'user_settings:settings' %}">Settings</a>
-            <a href="{% url 'login:logout' %}">Logout</a>
-            <div class="avatar">{{ username|slice:":1"|upper }}</div>
-        </div>
-    </div>
+            <form method="post" action="{% url 'login:logout' %}" class="logout-form">
+                {% csrf_token %}
+                <button type="submit">Log out</button>
+            </form>
+            <span class="genrx-avatar" title="{{ username }}">{{ username|slice:":1"|upper }}</span>
+        </nav>
+    </header>
 
-    <!-- Greeting -->
-    <div class="greeting-block">
-        <h1>Hey {{ username }}!</h1>
-        <p class="greeting-sub">Find your generic medicine</p>
-    </div>
-
-    <!-- Search / Scan card -->
-    <div class="search-card">
-        <div class="card-header">
-            <div class="card-icon-circle">🔍</div>
-            <span class="card-title">Medicine Lookup</span>
+    <main>
+        <div class="greeting-block">
+            <h1 class="page-title">Hello, {{ username }}</h1>
+            <p class="page-subtitle">Search a brand name to compare generic equivalents. Prices are sample data for this class project, not official MDRP prices.</p>
         </div>
 
-        <div class="action-row">
-            <div class="action-btn active" id="searchTab" onclick="showTab('search')">Search Medicine</div>
-            <div class="action-btn" id="scanTab" onclick="showTab('scan')">Scan Medicine</div>
+        <section class="card lookup-card" aria-labelledby="lookup-title">
+            <div class="lookup-head">
+                <h2 id="lookup-title">Medicine lookup</h2>
+                <p>Search by brand name or generic name.</p>
+            </div>
+
+            <div class="lookup-tabs" role="tablist" aria-label="Lookup method">
+                <button type="button" class="lookup-tab is-active" id="searchTab" role="tab" aria-selected="true" aria-controls="searchPanel">Search medicine</button>
+                <button type="button" class="lookup-tab" id="scanTab" role="tab" aria-selected="false" aria-controls="scanPanel">Scan medicine</button>
+            </div>
+
+            <div class="lookup-panel" id="searchPanel" role="tabpanel" aria-labelledby="searchTab">
+                <label class="sr-only" for="medicineSearch">Medicine name</label>
+                <div class="search-row">
+                    <input type="search" id="medicineSearch" placeholder="Type a brand or generic name, e.g. Biogesic" autocomplete="off" aria-describedby="searchHelp">
+                    <span class="search-spinner" id="searchSpinner" hidden aria-hidden="true"></span>
+                </div>
+                <p class="help" id="searchHelp">Try Biogesic, Losartan, or Coumadin.</p>
+            </div>
+
+            <div class="lookup-panel" id="scanPanel" role="tabpanel" aria-labelledby="scanTab" hidden>
+                <p class="scan-note">The scan page accepts a prescription photo and a typed medicine name. OCR is not connected yet, so the typed name does the matching.</p>
+                <a class="btn btn-secondary scan-link" href="{% url 'scans:scan' %}">Open scan page</a>
+            </div>
+        </section>
+
+        <p class="section-label" id="resultsLabel" aria-live="polite">Type a medicine name above</p>
+        <div id="resultsArea" aria-live="polite">
+            <div class="empty-state">Start typing to see matching medicines.</div>
         </div>
 
-        <div class="search-panel" id="searchPanel">
-            <input type="text" id="medicineSearch" placeholder="Type a brand name, e.g. Biogesic..." oninput="handleSearch()">
-        </div>
+        <section class="card detail-card" id="detailArea" hidden aria-labelledby="detailTitle">
+            <div class="detail-header">
+                <button type="button" class="back-btn" id="backBtn" aria-label="Back to search results">&#8592;</button>
+                <div>
+                    <h2 class="detail-title" id="detailTitle"></h2>
+                    <p class="detail-sub" id="detailSub"></p>
+                </div>
+            </div>
 
-        <div class="scan-panel hidden" id="scanPanel">
-            <span class="icon">📷</span>
-            Camera scan (OCR) is coming soon.<br>Use Search Medicine for now.
-        </div>
-    </div>
+            <div class="detail-meta" id="detailMeta"></div>
+            <div id="detailWarning"></div>
 
-    <!-- Results -->
-    <p class="section-label" id="resultsLabel">Type a medicine name above</p>
-    <div id="resultsArea">
-        <div class="empty-state">Try "Biogesic" or "Coumadin"</div>
-    </div>
+            <p class="section-label">Generic alternatives</p>
+            <div class="generic-list" id="genericList"></div>
 
-    <!-- Generic alternatives detail view -->
-    <div id="detailArea" class="hidden">
-        <div class="detail-header">
-            <button class="back-btn" onclick="backToResults()">←</button>
-            <span class="detail-title" id="detailTitle"></span>
-        </div>
-        <p class="detail-sub" id="detailSub"></p>
-        <p class="section-label">Generic Alternatives</p>
-        <div class="generic-list" id="genericList"></div>
-    </div>
+            <div class="detail-actions" id="detailActions" hidden>
+                <a class="btn btn-primary btn-block" id="pharmacyLink" href="{% url 'pharmacies:list' %}">Find pharmacies with this medicine</a>
+            </div>
+        </section>
 
+        <noscript>
+            <p class="alert alert-warning">Medicine search needs JavaScript. Please enable it in your browser.</p>
+        </noscript>
+    </main>
+
+    <footer class="genrx-footer">
+        GeneRX sample data for CSIT327. Not medical advice. Confirm any switch with your pharmacist or doctor.
+    </footer>
 </div>
+
+<script>
+    // Django builds the URLs once; home.js only fetches data from them.
+    window.GENRX_URLS = {
+        search: "{% url 'medicines:search' %}",
+        genericsTemplate: "{% url 'medicines:generics' 0 %}",
+        pharmacies: "{% url 'pharmacies:list' %}"
+    };
+</script>
 <script src="{% static 'js/home/home.js' %}"></script>
 </body>
 </html>
