@@ -1,110 +1,91 @@
+{% extends "shared/base.html" %}
 {% load static %}
 {% get_media_prefix as MEDIA_PREFIX %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scan history - GeneRX</title>
-    <link rel="stylesheet" href="{% static 'css/shared/theme.css' %}">
-    <link rel="stylesheet" href="{% static 'css/scans/history.css' %}">
-</head>
-<body class="genrx{% if genrx_settings.dark_mode %} dark-mode{% endif %}">
-<div class="genrx-shell">
 
-    <header class="genrx-top">
-        <a class="genrx-brand" href="{% url 'home:home' %}">
-            <span class="genrx-brand-mark" aria-hidden="true">Rx</span>
-            <span>
-                <span class="genrx-brand-name">GeneRX</span>
-                <span class="genrx-brand-tag">Generic medicine finder</span>
-            </span>
-        </a>
+{% block title %}Scan history · GeneRX{% endblock %}
 
-        <nav class="genrx-nav" aria-label="Main navigation">
-            <a href="{% url 'home:home' %}">Search</a>
-            <a href="{% url 'pharmacies:list' %}">Pharmacies</a>
-            <a href="{% url 'scans:history' %}" class="is-current" aria-current="page">History</a>
-            <a href="{% url 'user_profile:profile' %}">Profile</a>
-            <a href="{% url 'user_settings:settings' %}">Settings</a>
-            <form method="post" action="{% url 'login:logout' %}" class="logout-form">
-                {% csrf_token %}
-                <button type="submit">Log out</button>
-            </form>
-            <span class="genrx-avatar" title="{{ request.user.username }}">{{ request.user.username|slice:":1"|upper }}</span>
-        </nav>
-    </header>
+{% block page_css %}
+<link rel="stylesheet" href="{% static 'css/scans/history.css' %}?v=4">
+{% endblock %}
 
-    <main>
-        <div class="greeting-block">
-            <h1 class="page-title">Scan history</h1>
-            <p class="page-subtitle">Only your own scans appear here. Newest entries are first.</p>
+{% block content %}
+<section class="masthead masthead--compact">
+    <p class="eyebrow">Private ledger</p>
+    <h1 class="display-title">Every scan, on<br>the <em>record</em>.</h1>
+    <p class="lead">Only your own scans appear here, newest first. Each row keeps the typed text, the saved match, and the confidence score.</p>
+</section>
+
+{% if scans %}
+    <div class="ledger-toolbar">
+        <div class="list-heading">
+            <h2 class="section-title">Scan entries</h2>
+            <span class="section-hint">{{ scans|length }} record{{ scans|length|pluralize }}</span>
+        </div>
+        <a class="text-link" href="{% url 'scans:scan' %}">New scan <span aria-hidden="true">&rarr;</span></a>
+    </div>
+
+    <div class="ledger" role="table" aria-label="Scan history">
+        <div class="ledger-head" role="row">
+            <span role="columnheader">Date</span>
+            <span role="columnheader">Typed input</span>
+            <span role="columnheader">Matched medicine</span>
+            <span role="columnheader">Confidence</span>
+            <span role="columnheader">Actions</span>
         </div>
 
-        {% if scans %}
-            <div class="history-list">
-                {% for scan in scans %}
-                    <article class="history-item">
-                        <div class="history-when">
-                            <time datetime="{{ scan.created_at|date:'c' }}">{{ scan.created_at|date:"M j, Y" }}</time>
-                            <span>{{ scan.created_at|date:"g:i A" }}</span>
-                        </div>
+        {% for scan in scans %}
+            <article class="ledger-row" role="row">
+                <div class="ledger-when" role="cell" data-label="Date">
+                    <time datetime="{{ scan.created_at|date:'c' }}">{{ scan.created_at|date:"M j, Y" }}</time>
+                    <span>{{ scan.created_at|date:"g:i A" }}</span>
+                </div>
 
-                        <div class="history-block">
-                            <span class="history-label">Typed input</span>
-                            <p>{{ scan.extracted_text|default:"No text entered" }}</p>
-                        </div>
+                <div class="ledger-cell" role="cell" data-label="Typed input">
+                    <p class="ledger-input">{{ scan.extracted_text|default:"No text entered" }}</p>
+                </div>
 
-                        <div class="history-block">
-                            <span class="history-label">Matched medicine</span>
-                            {% if scan.matched_medicine %}
-                                <p>
-                                    <strong>{{ scan.matched_medicine.brand_name }}</strong><br>
-                                    <span class="history-muted">{{ scan.matched_medicine.generic_name }}</span>
-                                </p>
-                            {% else %}
-                                <p class="history-muted">No match saved</p>
-                            {% endif %}
-                        </div>
+                <div class="ledger-cell" role="cell" data-label="Matched medicine">
+                    {% if scan.matched_medicine %}
+                        <p class="ledger-match">
+                            <strong>{{ scan.matched_medicine.brand_name }}</strong>
+                            <span>{{ scan.matched_medicine.generic_name }}</span>
+                        </p>
+                    {% else %}
+                        <p class="ledger-muted">No match saved</p>
+                    {% endif %}
+                </div>
 
-                        <div class="history-block">
-                            <span class="history-label">Confidence</span>
-                            {% if scan.confidence_score is not None %}
-                                {% if scan.confidence_score >= 90 %}
-                                    <span class="badge badge-high">{{ scan.confidence_score|floatformat:2 }}%</span>
-                                {% elif scan.confidence_score >= 70 %}
-                                    <span class="badge badge-mid">{{ scan.confidence_score|floatformat:2 }}%</span>
-                                {% else %}
-                                    <span class="badge badge-low">{{ scan.confidence_score|floatformat:2 }}%</span>
-                                {% endif %}
-                            {% else %}
-                                <p class="history-muted">Not scored</p>
-                            {% endif %}
-                        </div>
+                <div class="ledger-cell" role="cell" data-label="Confidence">
+                    {% if scan.confidence_score is not None %}
+                        {% if scan.confidence_score >= 90 %}
+                            <span class="badge badge-high">{{ scan.confidence_score|floatformat:2 }}%</span>
+                        {% elif scan.confidence_score >= 70 %}
+                            <span class="badge badge-mid">{{ scan.confidence_score|floatformat:2 }}%</span>
+                        {% else %}
+                            <span class="badge badge-low">{{ scan.confidence_score|floatformat:2 }}%</span>
+                        {% endif %}
+                    {% else %}
+                        <span class="ledger-muted">Not scored</span>
+                    {% endif %}
+                </div>
 
-                        <div class="history-action">
-                            {% if scan.matched_medicine %}
-                                <a class="btn btn-secondary" href="{% url 'pharmacies:list' %}?medicine={{ scan.matched_medicine.id }}">Find pharmacies</a>
-                            {% else %}
-                                <a class="btn btn-secondary" href="{% url 'home:home' %}">Search manually</a>
-                            {% endif %}
-                            {% if scan.image_path %}
-                                <a class="btn btn-quiet" href="{{ MEDIA_PREFIX }}{{ scan.image_path }}" target="_blank" rel="noopener">View image</a>
-                            {% endif %}
-                        </div>
-                    </article>
-                {% endfor %}
-            </div>
-        {% else %}
-            <div class="empty-state">
-                No scans yet. Open the scan page to upload a prescription image or type a medicine name.
-            </div>
-        {% endif %}
-    </main>
-
-    <footer class="genrx-footer">
-        Scan history is private to your account in this demo. Images and text are sample storage only.
-    </footer>
-</div>
-</body>
-</html>
+                <div class="ledger-actions" role="cell">
+                    {% if scan.matched_medicine %}
+                        <a class="text-link" href="{% url 'pharmacies:list' %}?medicine={{ scan.matched_medicine.id }}">Find pharmacies</a>
+                    {% else %}
+                        <a class="text-link" href="{% url 'home:home' %}">Search manually</a>
+                    {% endif %}
+                    {% if scan.image_path %}
+                        <a class="text-link" href="{{ MEDIA_PREFIX }}{{ scan.image_path }}" target="_blank" rel="noopener">View image</a>
+                    {% endif %}
+                </div>
+            </article>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="empty-state">
+        <strong>No scans yet.</strong> Open the scan page to upload a prescription image or type a medicine name.
+        <p class="empty-action"><a class="btn btn-primary" href="{% url 'scans:scan' %}">Open scan page</a></p>
+    </div>
+{% endif %}
+{% endblock %}

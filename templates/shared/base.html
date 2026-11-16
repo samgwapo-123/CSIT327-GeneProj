@@ -1,0 +1,52 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" class="genrx{% if genrx_settings.dark_mode %} dark-mode{% endif %}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="GeneRX sample generic medicine finder for CSIT327.">
+    <title>{% block title %}GeneRX{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/shared/theme.css' %}?v=4">
+    {% block page_css %}{% endblock %}
+</head>
+<body class="genrx{% if genrx_settings.dark_mode %} dark-mode{% endif %}">
+<a class="skip-link" href="#main-content">Skip to content</a>
+
+<div class="genrx-shell">
+    <header class="genrx-top">
+        <a class="genrx-brand" href="{% url 'home:home' %}">
+            <span class="genrx-brand-mark" aria-hidden="true">Rx</span>
+            <span class="genrx-brand-text">
+                <span class="genrx-brand-name">GeneRX</span>
+                <span class="genrx-brand-tag">Generic medicine finder</span>
+            </span>
+        </a>
+
+        <nav class="genrx-nav" aria-label="Main navigation">
+            <a href="{% url 'home:home' %}"{% if request.path == '/' %} class="is-current" aria-current="page"{% endif %}>Search</a>
+            <a href="{% url 'pharmacies:list' %}"{% if request.path == '/pharmacies/' %} class="is-current" aria-current="page"{% endif %}>Pharmacies</a>
+            <a href="{% url 'scans:scan' %}"{% if request.path == '/scans/' %} class="is-current" aria-current="page"{% endif %}>Scan</a>
+            <a href="{% url 'scans:history' %}"{% if request.path == '/scans/history/' %} class="is-current" aria-current="page"{% endif %}>History</a>
+            <a href="{% url 'user_profile:profile' %}"{% if request.path == '/profile/' %} class="is-current" aria-current="page"{% endif %}>Profile</a>
+            <a href="{% url 'user_settings:settings' %}"{% if request.path == '/settings/' %} class="is-current" aria-current="page"{% endif %}>Settings</a>
+            <form method="post" action="{% url 'login:logout' %}" class="logout-form">
+                {% csrf_token %}
+                <button type="submit">Log out</button>
+            </form>
+            <span class="genrx-avatar" title="{{ request.user.username }}">{{ request.user.username|slice:":1"|upper }}</span>
+        </nav>
+    </header>
+
+    <main id="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="genrx-footer">
+        <span>GeneRX · CSIT327 class project</span>
+        <span>Sample data, not medical advice.</span>
+    </footer>
+</div>
+
+{% block scripts %}{% endblock %}
+</body>
+</html>

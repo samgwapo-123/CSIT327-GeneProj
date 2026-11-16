@@ -11,7 +11,7 @@
     var sortAzButton = document.getElementById("sortAz");
     var sortNearestButton = document.getElementById("sortNearest");
     var status = document.getElementById("sortStatus");
-    var cards = Array.prototype.slice.call(list.querySelectorAll(".pharmacy-card"));
+    var cards = Array.prototype.slice.call(list.querySelectorAll(".pharmacy-row"));
 
     // The server already sorts A-Z, so this array is the fallback order.
     var alphabeticalOrder = cards.slice();
@@ -42,6 +42,14 @@
         });
     }
 
+    function setActiveSort(activeButton) {
+        [sortAzButton, sortNearestButton].forEach(function (button) {
+            var isActive = button === activeButton;
+            button.classList.toggle("is-active", isActive);
+            button.setAttribute("aria-pressed", String(isActive));
+        });
+    }
+
     function showDistances(origin) {
         cards.forEach(function (card) {
             var latitude = toNumber(card.getAttribute("data-latitude"));
@@ -61,12 +69,14 @@
 
     sortAzButton.addEventListener("click", function () {
         setOrder(alphabeticalOrder);
+        setActiveSort(sortAzButton);
         status.textContent = "Sorted alphabetically.";
     });
 
     sortNearestButton.addEventListener("click", function () {
         if (!navigator.geolocation) {
             setOrder(alphabeticalOrder);
+            setActiveSort(sortAzButton);
             status.textContent = "This browser does not support geolocation. Showing A-Z order.";
             return;
         }
@@ -84,10 +94,12 @@
                 });
 
                 setOrder(sorted);
+                setActiveSort(sortNearestButton);
                 status.textContent = "Sorted nearest first from your current location.";
             },
             function () {
                 setOrder(alphabeticalOrder);
+                setActiveSort(sortAzButton);
                 status.textContent = "Location permission was denied or unavailable. Showing A-Z order.";
             },
             { enableHighAccuracy: false, timeout: 8000, maximumAge: 300000 }

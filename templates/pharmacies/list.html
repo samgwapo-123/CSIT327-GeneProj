@@ -1,51 +1,29 @@
+{% extends "shared/base.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pharmacies - GeneRX</title>
-    <link rel="stylesheet" href="{% static 'css/shared/theme.css' %}">
-    <link rel="stylesheet" href="{% static 'css/pharmacies/list.css' %}">
-</head>
-<body class="genrx{% if genrx_settings.dark_mode %} dark-mode{% endif %}">
-<div class="genrx-shell">
 
-    <header class="genrx-top">
-        <a class="genrx-brand" href="{% url 'home:home' %}">
-            <span class="genrx-brand-mark" aria-hidden="true">Rx</span>
-            <span>
-                <span class="genrx-brand-name">GeneRX</span>
-                <span class="genrx-brand-tag">Generic medicine finder</span>
-            </span>
-        </a>
+{% block title %}Pharmacies · GeneRX{% endblock %}
 
-        <nav class="genrx-nav" aria-label="Main navigation">
-            <a href="{% url 'home:home' %}">Search</a>
-            <a href="{% url 'pharmacies:list' %}" class="is-current" aria-current="page">Pharmacies</a>
-            <a href="{% url 'user_profile:profile' %}">Profile</a>
-            <a href="{% url 'user_settings:settings' %}">Settings</a>
-            <form method="post" action="{% url 'login:logout' %}" class="logout-form">
-                {% csrf_token %}
-                <button type="submit">Log out</button>
-            </form>
-            <span class="genrx-avatar" title="{{ request.user.username }}">{{ request.user.username|slice:":1"|upper }}</span>
-        </nav>
-    </header>
+{% block page_css %}
+<link rel="stylesheet" href="{% static 'css/pharmacies/list.css' %}?v=4">
+{% endblock %}
 
-    <main>
-        <div class="greeting-block">
-            <h1 class="page-title">Pharmacy locator</h1>
-            <p class="page-subtitle">Sample Cebu City pharmacies. Choose a medicine to see its stock status, then open directions in Google Maps.</p>
-        </div>
+{% block content %}
+<section class="masthead masthead--compact">
+    <p class="eyebrow">Pharmacy locator · Cebu City</p>
+    <h1 class="display-title">Check the shelf<br>before you <em>travel</em>.</h1>
+    <p class="lead">Sample Cebu City pharmacies. Choose a medicine to compare stock, then open directions in Google Maps. Call ahead before making the trip.</p>
+</section>
 
-        <section class="card filter-card" aria-labelledby="filter-title">
-            <h2 id="filter-title">Check stock</h2>
+<div class="locator-layout">
+    <aside class="locator-rail" aria-label="Stock and sorting controls">
+        <section class="stock-panel" aria-labelledby="filter-title">
+            <p class="eyebrow">Stock check</p>
+            <h2 id="filter-title" class="rail-title">Pick a medicine</h2>
             <form method="get" class="filter-form">
                 <div class="field">
                     <label for="medicine">Medicine</label>
                     <select id="medicine" name="medicine">
-                        <option value="">All pharmacies (no stock column)</option>
+                        <option value="">All pharmacies (no stock)</option>
                         {% for medicine in medicines %}
                             <option value="{{ medicine.id }}" {% if selected_medicine and selected_medicine.id == medicine.id %}selected{% endif %}>
                                 {{ medicine.brand_name }} — {{ medicine.generic_name }}
@@ -53,7 +31,7 @@
                         {% endfor %}
                     </select>
                 </div>
-                <button type="submit" class="btn btn-primary">Show stock</button>
+                <button type="submit" class="btn btn-primary btn-block">Show stock</button>
             </form>
             {% if selected_medicine %}
                 <p class="filter-note">Stock shown for <strong>{{ selected_medicine.brand_name }}</strong> ({{ selected_medicine.generic_name }}).</p>
@@ -62,22 +40,35 @@
             {% endif %}
         </section>
 
-        <div class="sort-bar">
-            <div class="sort-actions" role="group" aria-label="Sort pharmacies">
-                <button type="button" class="btn btn-secondary" id="sortAz">Sort A-Z</button>
-                <button type="button" class="btn btn-primary" id="sortNearest">Nearest first</button>
+        <section class="rail-note" aria-labelledby="rail-note-title">
+            <h2 id="rail-note-title" class="rail-note-title">Before you go</h2>
+            <p>Stock and hours are sample data. Phone the pharmacy to confirm before travelling.</p>
+        </section>
+    </aside>
+
+    <section class="locator-main" aria-labelledby="list-title">
+        <div class="list-toolbar">
+            <div class="list-heading">
+                <h2 id="list-title" class="section-title">Sample pharmacies</h2>
+                <span class="section-hint">{{ pharmacy_rows|length }} location{{ pharmacy_rows|length|pluralize }}</span>
             </div>
-            <p class="sort-status" id="sortStatus" aria-live="polite">Sorted alphabetically.</p>
+
+            <div class="sort-group" role="group" aria-label="Sort pharmacies">
+                <span class="sort-label">Sort</span>
+                <button type="button" class="sort-button is-active" id="sortAz" aria-pressed="true">A–Z</button>
+                <button type="button" class="sort-button" id="sortNearest" aria-pressed="false">Nearest first</button>
+            </div>
         </div>
+        <p class="sort-status" id="sortStatus" aria-live="polite">Sorted alphabetically.</p>
 
         <div class="pharmacy-list" id="pharmacyList">
             {% for row in pharmacy_rows %}
-                <article class="pharmacy-card"
+                <article class="pharmacy-row"
                          data-latitude="{{ row.pharmacy.latitude }}"
                          data-longitude="{{ row.pharmacy.longitude }}">
                     <div class="pharmacy-main">
                         <div class="pharmacy-topline">
-                            <h2>{{ row.pharmacy.name }}</h2>
+                            <h2 class="pharmacy-name">{{ row.pharmacy.name }}</h2>
                             {% if selected_medicine %}
                                 {% if row.stock is None %}
                                     <span class="badge badge-unlisted">Not listed</span>
@@ -106,23 +97,20 @@
                     </div>
 
                     <div class="pharmacy-actions">
-                        <a class="btn btn-secondary"
+                        <a class="pharmacy-directions"
                            href="https://www.google.com/maps/dir/?api=1&amp;destination={{ row.pharmacy.latitude }},{{ row.pharmacy.longitude }}"
                            target="_blank"
-                           rel="noopener noreferrer">Get directions</a>
+                           rel="noopener noreferrer">Directions <span aria-hidden="true">&#8599;</span></a>
                     </div>
                 </article>
             {% empty %}
                 <div class="empty-state">No pharmacies have been added yet. Run the seed command to load sample data.</div>
             {% endfor %}
         </div>
-    </main>
-
-    <footer class="genrx-footer">
-        Pharmacy details and stock are sample data for CSIT327. Call ahead before travelling.
-    </footer>
+    </section>
 </div>
+{% endblock %}
 
-<script src="{% static 'js/pharmacies/list.js' %}"></script>
-</body>
-</html>
+{% block scripts %}
+<script src="{% static 'js/pharmacies/list.js' %}?v=4"></script>
+{% endblock %}

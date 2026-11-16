@@ -1,142 +1,213 @@
-/* Scan page: upload form, confidence result, and stored-image preview. */
+/* Scan page: an intake form, a confidence guide, and a result sheet. */
 
-.greeting-block {
+.scan-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.6fr) minmax(230px, 0.75fr);
+    gap: 48px;
+    align-items: start;
+    margin-top: 26px;
+}
+
+.scan-main {
+    min-width: 0;
+}
+
+.scan-aside {
+    min-width: 0;
+    position: sticky;
+    top: 24px;
+    padding-left: 26px;
+    border-left: 1px solid var(--genrx-border);
+}
+
+/* ---------- Intake form ---------- */
+.intake-panel {
+    padding: 24px;
+    background: var(--genrx-surface);
+    border: 1px solid var(--genrx-border);
+    border-radius: var(--genrx-radius);
+    box-shadow: var(--genrx-shadow);
+}
+
+.panel-heading {
+    display: grid;
+    grid-template-columns: 34px minmax(0, 1fr);
+    gap: 12px;
+    padding-bottom: 18px;
     margin-bottom: 20px;
+    border-bottom: 1px solid var(--genrx-border);
 }
 
-.message-list {
-    margin-bottom: 14px;
+.panel-number {
+    padding-top: 4px;
+    font-family: var(--genrx-font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--genrx-muted);
 }
 
-.message-list .alert {
+.panel-heading h2 {
     margin: 0;
+    font-family: var(--genrx-font-display);
+    font-size: 25px;
+    font-weight: 600;
+    line-height: 1.15;
+    letter-spacing: -0.015em;
 }
 
-.scan-form {
-    margin-top: 14px;
+.panel-heading p {
+    margin: 4px 0 0;
+    color: var(--genrx-muted);
+    font-size: 13px;
+    line-height: 1.5;
 }
 
-.scan-form .btn {
-    margin-top: 6px;
+.form-note {
+    color: var(--genrx-muted);
+    font-size: 12px;
 }
 
-/* ---------- Result card ---------- */
-.result-card {
-    margin-top: 18px;
+/* ---------- Result sheet ---------- */
+.scan-result {
+    margin-top: 32px;
+    padding: 26px 26px 26px 24px;
+    background: var(--genrx-surface);
+    border: 1px solid var(--genrx-border);
+    border-left: 3px solid var(--genrx-accent);
+    border-radius: 0 var(--genrx-radius) var(--genrx-radius) 0;
+    box-shadow: var(--genrx-shadow);
+}
+
+.scan-result--matched {
+    border-left-color: var(--genrx-success);
+}
+
+.scan-result--confirm {
+    border-left-color: var(--genrx-warning);
+}
+
+.scan-result--manual {
+    border-left-color: var(--genrx-danger);
 }
 
 .result-heading {
-    padding-bottom: 14px;
+    padding-bottom: 18px;
     border-bottom: 1px solid var(--genrx-border);
 }
 
 .result-heading h2 {
-    margin: 8px 0 3px;
-    font-size: 19px;
-    letter-spacing: -0.01em;
+    margin: 10px 0 4px;
+    font-family: var(--genrx-font-display);
+    font-size: clamp(26px, 3.4vw, 34px);
+    font-weight: 600;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
 }
 
 .result-heading p {
     margin: 0;
+    max-width: 62ch;
     color: var(--genrx-muted);
-    font-size: 13px;
-    max-width: 60ch;
-}
-
-.badge {
-    display: inline-block;
-    padding: 3px 7px;
-    border-radius: 4px;
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-}
-
-.badge-high,
-.badge-otc {
-    background: var(--genrx-success-soft);
-    color: var(--genrx-success);
-}
-
-.badge-mid {
-    background: var(--genrx-warning-soft);
-    color: var(--genrx-warning);
-}
-
-.badge-low,
-.badge-rx {
-    background: var(--genrx-danger-soft);
-    color: var(--genrx-danger);
+    font-size: 13.5px;
+    line-height: 1.55;
 }
 
 .result-medicine {
-    padding: 16px 0;
+    padding: 20px 0;
+    border-bottom: 1px solid var(--genrx-border);
 }
 
 .result-topline {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 10px;
+    gap: 8px 12px;
 }
 
 .result-topline h3 {
     margin: 0;
-    font-size: 20px;
-    letter-spacing: -0.01em;
+    font-family: var(--genrx-font-display);
+    font-size: 26px;
+    font-weight: 600;
+    line-height: 1.15;
+    letter-spacing: -0.015em;
 }
 
 .result-generic {
-    margin: 3px 0 0;
+    margin: 4px 0 0;
     color: var(--genrx-muted);
-    font-size: 13px;
+    font-size: 13.5px;
 }
 
 .result-confidence {
-    margin: 8px 0 0;
-    color: var(--genrx-blue-dark);
-    font-size: 13px;
+    margin: 12px 0 0;
+    font-family: var(--genrx-font-mono);
+    font-size: 12px;
     font-weight: 700;
+    color: var(--genrx-accent-ink);
     font-variant-numeric: tabular-nums;
 }
 
+.confidence-meter {
+    height: 4px;
+    margin-top: 8px;
+    max-width: 300px;
+    background: var(--genrx-subtle);
+    border: 1px solid var(--genrx-border);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.confidence-meter span {
+    display: block;
+    height: 100%;
+    background: var(--genrx-accent);
+}
+
+.scan-result--matched .confidence-meter span {
+    background: var(--genrx-success);
+}
+
+.scan-result--confirm .confidence-meter span {
+    background: var(--genrx-warning);
+}
+
 .nti-note {
-    margin: 10px 0 0;
-    padding-left: 8px;
+    margin: 12px 0 0;
+    padding-left: 10px;
     border-left: 2px solid var(--genrx-warning);
     color: var(--genrx-warning);
     font-size: 12px;
+    line-height: 1.5;
 }
 
 .result-actions,
 .confirm-form {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
-    padding-top: 14px;
-    border-top: 1px solid var(--genrx-border);
+    align-items: center;
+    gap: 10px 16px;
+    padding-top: 20px;
 }
 
-.result-actions .btn,
-.confirm-form .btn {
-    flex: 1 1 auto;
+.confirm-form {
+    padding-top: 20px;
 }
 
-/* ---------- Stored image ---------- */
+/* ---------- Image preview ---------- */
 .scan-preview {
-    margin: 18px 0 0;
-    padding-top: 16px;
+    margin: 22px 0 0;
+    padding-top: 18px;
     border-top: 1px solid var(--genrx-border);
 }
 
 .scan-preview img {
     display: block;
-    width: 100%;
-    max-width: 340px;
-    height: auto;
+    width: auto;
+    max-width: 100%;
+    max-height: 320px;
     border: 1px solid var(--genrx-border);
-    border-radius: 8px;
+    border-radius: var(--genrx-radius-sm);
     background: var(--genrx-subtle);
 }
 
@@ -146,9 +217,94 @@
     font-size: 12px;
 }
 
-@media (max-width: 480px) {
+/* ---------- Confidence guide ---------- */
+.aside-title {
+    margin: 8px 0 18px;
+    font-family: var(--genrx-font-display);
+    font-size: 23px;
+    font-weight: 600;
+    line-height: 1.15;
+    letter-spacing: -0.015em;
+}
+
+.threshold-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0;
+}
+
+.threshold-list li {
+    display: grid;
+    grid-template-columns: 54px minmax(0, 1fr);
+    gap: 12px;
+    padding: 13px 0;
+    border-top: 1px solid var(--genrx-border);
+}
+
+.threshold-value {
+    font-family: var(--genrx-font-mono);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--genrx-accent-ink);
+    font-variant-numeric: tabular-nums;
+}
+
+.threshold-list strong {
+    display: block;
+    font-size: 13px;
+}
+
+.threshold-list p {
+    margin: 2px 0 0;
+    color: var(--genrx-muted);
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.aside-footnote {
+    margin: 18px 0 0;
+    padding-top: 14px;
+    border-top: 1px solid var(--genrx-border);
+    color: var(--genrx-muted);
+    font-size: 12px;
+    line-height: 1.55;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 900px) {
+    .scan-layout {
+        grid-template-columns: 1fr;
+        gap: 32px;
+    }
+
+    .scan-aside {
+        position: static;
+        padding-left: 0;
+        padding-top: 26px;
+        border-left: 0;
+        border-top: 1px solid var(--genrx-border);
+    }
+}
+
+@media (max-width: 640px) {
+    .intake-panel,
+    .scan-result {
+        padding: 18px;
+    }
+
+    .scan-result {
+        border-radius: 0 var(--genrx-radius) var(--genrx-radius) 0;
+    }
+
+    .panel-heading {
+        grid-template-columns: 26px minmax(0, 1fr);
+        gap: 10px;
+    }
+
     .result-actions .btn,
     .confirm-form .btn {
-        flex-basis: 100%;
+        width: 100%;
     }
 }

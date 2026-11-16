@@ -1,76 +1,186 @@
-/* Pharmacy locator: stock filter, alphabetical list, optional geolocation sort. */
+/* Pharmacy locator: stock rail on the left, a ruled directory on
+   the right. Rows behave like an index, not like stacked cards. */
 
-.greeting-block {
-    margin-bottom: 22px;
-}
-
-/* ---------- Medicine filter ---------- */
-.filter-card h2 {
-    margin: 0 0 14px;
-    font-size: 16px;
-    letter-spacing: -0.01em;
-}
-
-.filter-form {
-    display: flex;
-    align-items: flex-end;
-    gap: 12px;
-}
-
-.filter-form .field {
-    flex: 1;
-    margin-bottom: 0;
-}
-
-.filter-form .btn {
-    flex-shrink: 0;
-}
-
-.filter-note {
-    margin: 14px 0 0;
-    padding-top: 12px;
-    border-top: 1px solid var(--genrx-border);
-    color: var(--genrx-muted);
-    font-size: 13px;
-}
-
-/* ---------- Sort controls ---------- */
-.sort-bar {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    margin: 20px 0 12px;
-}
-
-.sort-actions {
-    display: flex;
-    gap: 8px;
-}
-
-.sort-status {
-    margin: 0;
-    color: var(--genrx-muted);
-    font-size: 12.5px;
-}
-
-/* ---------- Pharmacy cards ---------- */
-.pharmacy-list {
+.locator-layout {
     display: grid;
-    gap: 12px;
+    grid-template-columns: minmax(240px, 300px) minmax(0, 1fr);
+    gap: 48px;
+    align-items: start;
 }
 
-.pharmacy-card {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 20px;
-    padding: 18px 20px;
+.locator-rail {
+    position: sticky;
+    top: 24px;
+    min-width: 0;
+}
+
+.locator-main {
+    min-width: 0;
+}
+
+/* ---------- Stock panel ---------- */
+.stock-panel {
+    padding: 22px;
     background: var(--genrx-surface);
     border: 1px solid var(--genrx-border);
     border-radius: var(--genrx-radius);
     box-shadow: var(--genrx-shadow);
+}
+
+.stock-panel .eyebrow {
+    margin-bottom: 8px;
+}
+
+.rail-title {
+    margin: 0 0 18px;
+    font-family: var(--genrx-font-display);
+    font-size: 23px;
+    font-weight: 600;
+    line-height: 1.15;
+    letter-spacing: -0.015em;
+}
+
+.filter-form .field {
+    margin-bottom: 14px;
+}
+
+.filter-form select {
+    background: var(--genrx-surface);
+}
+
+.filter-form .btn {
+    margin-top: 2px;
+}
+
+.filter-note {
+    margin: 16px 0 0;
+    padding-top: 14px;
+    border-top: 1px solid var(--genrx-border);
+    color: var(--genrx-muted);
+    font-size: 12.5px;
+    line-height: 1.55;
+}
+
+.filter-note strong {
+    color: var(--genrx-ink);
+}
+
+/* ---------- Rail note ---------- */
+.rail-note {
+    margin-top: 24px;
+    padding: 18px 0 0 16px;
+    border-left: 2px solid var(--genrx-accent);
+}
+
+.rail-note-title {
+    margin: 0 0 6px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--genrx-muted);
+}
+
+.rail-note p {
+    margin: 0;
+    color: var(--genrx-muted);
+    font-size: 12.5px;
+    line-height: 1.55;
+}
+
+/* ---------- List toolbar ---------- */
+.list-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 12px 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--genrx-border);
+}
+
+.list-heading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 6px 14px;
+}
+
+.sort-group {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px;
+}
+
+.sort-label {
+    margin-right: 4px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--genrx-muted);
+}
+
+.sort-button {
+    min-height: 30px;
+    padding: 0 9px;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    background: none;
+    color: var(--genrx-muted);
+    font: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.sort-button:hover {
+    background: var(--genrx-subtle);
+    color: var(--genrx-ink);
+}
+
+.sort-button.is-active {
+    border-color: var(--genrx-border-strong);
+    background: var(--genrx-accent-soft);
+    color: var(--genrx-accent-ink);
+}
+
+.sort-button:focus-visible {
+    outline: 2px solid var(--genrx-accent-strong);
+    outline-offset: 2px;
+}
+
+.sort-status {
+    margin: 8px 0 0;
+    color: var(--genrx-muted);
+    font-size: 12px;
+}
+
+/* ---------- Directory rows ---------- */
+.pharmacy-list {
+    counter-reset: pharmacy;
+    margin-top: 4px;
+}
+
+.pharmacy-row {
+    display: grid;
+    grid-template-columns: 42px minmax(0, 1fr) auto;
+    gap: 16px;
+    align-items: start;
+    padding: 22px 0;
+    border-bottom: 1px solid var(--genrx-border);
+}
+
+.pharmacy-row::before {
+    counter-increment: pharmacy;
+    content: counter(pharmacy, decimal-leading-zero);
+    padding-top: 5px;
+    font-family: var(--genrx-font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--genrx-muted);
+    letter-spacing: 0.04em;
 }
 
 .pharmacy-main {
@@ -81,38 +191,43 @@
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 10px;
+    gap: 8px 12px;
 }
 
-.pharmacy-topline h2 {
+.pharmacy-name {
     margin: 0;
-    font-size: 16px;
-    letter-spacing: -0.01em;
+    font-family: var(--genrx-font-display);
+    font-size: 22px;
+    font-weight: 600;
+    line-height: 1.15;
+    letter-spacing: -0.015em;
 }
 
 .pharmacy-address {
-    margin: 3px 0 0;
-    color: var(--genrx-muted);
-    font-size: 13px;
+    margin: 5px 0 0;
+    color: var(--genrx-ink-soft);
+    font-size: 13.5px;
+    line-height: 1.5;
 }
 
 .pharmacy-facts {
     display: flex;
     flex-wrap: wrap;
-    gap: 6px 26px;
+    gap: 4px 28px;
     margin: 12px 0 0;
 }
 
 .pharmacy-facts div {
     display: flex;
-    gap: 6px;
     align-items: baseline;
+    gap: 7px;
+    min-width: 0;
 }
 
 .pharmacy-facts dt {
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 700;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.09em;
     text-transform: uppercase;
     color: var(--genrx-muted);
 }
@@ -120,62 +235,90 @@
 .pharmacy-facts dd {
     margin: 0;
     font-size: 12.5px;
-    color: var(--genrx-ink);
+    color: var(--genrx-ink-soft);
 }
 
 .pharmacy-distance {
-    margin: 10px 0 0;
-    color: var(--genrx-blue-dark);
-    font-size: 12.5px;
-    font-weight: 600;
-    font-variant-numeric: tabular-nums;
+    margin: 8px 0 0;
+    font-family: var(--genrx-font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--genrx-accent-ink);
 }
 
 .pharmacy-actions {
-    flex-shrink: 0;
     padding-top: 2px;
 }
 
-/* ---------- Stock badges ---------- */
-.badge {
-    display: inline-block;
-    padding: 3px 7px;
-    border-radius: 4px;
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
+.pharmacy-directions {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    min-height: 34px;
+    padding: 0 12px;
+    border: 1px solid var(--genrx-border-strong);
+    border-radius: 6px;
+    background: transparent;
+    color: var(--genrx-ink);
+    font-size: 12px;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
 }
 
-.badge-instock {
-    background: var(--genrx-success-soft);
-    color: var(--genrx-success);
+.pharmacy-directions:hover {
+    border-color: var(--genrx-accent);
+    background: var(--genrx-accent-soft);
+    color: var(--genrx-accent-ink);
 }
 
-.badge-outstock {
-    background: var(--genrx-danger-soft);
-    color: var(--genrx-danger);
+.pharmacy-directions:focus-visible {
+    outline: none;
+    box-shadow: var(--genrx-focus);
 }
 
-.badge-unlisted {
-    background: var(--genrx-subtle);
-    color: var(--genrx-muted);
-    border: 1px solid var(--genrx-border);
+/* ---------- Responsive ---------- */
+@media (max-width: 900px) {
+    .locator-layout {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+
+    .locator-rail {
+        position: static;
+    }
+
+    .stock-panel {
+        padding: 18px;
+    }
+
+    .rail-note {
+        margin-top: 18px;
+    }
 }
 
 @media (max-width: 640px) {
-    .filter-form {
-        flex-direction: column;
-        align-items: stretch;
+    .pharmacy-row {
+        grid-template-columns: 28px minmax(0, 1fr);
+        gap: 10px;
+        padding: 18px 0;
     }
 
-    .pharmacy-card {
-        flex-direction: column;
-        gap: 14px;
+    .pharmacy-actions {
+        grid-column: 2;
+        padding-top: 8px;
     }
 
-    .pharmacy-actions,
-    .pharmacy-actions .btn {
-        width: 100%;
+    .pharmacy-directions {
+        min-height: 40px;
+    }
+
+    .pharmacy-name {
+        font-size: 20px;
+    }
+
+    .pharmacy-facts {
+        flex-direction: column;
+        gap: 5px;
     }
 }

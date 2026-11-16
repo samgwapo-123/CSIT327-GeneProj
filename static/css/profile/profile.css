@@ -1,90 +1,129 @@
-/* Profile page: identity summary and editable details. */
+/* Profile: a record card on the left, an open editing form on the right. */
 
-.greeting-block {
-    margin-bottom: 22px;
-}
-
-.message-list {
-    margin-bottom: 14px;
-}
-
-.message-list .alert {
-    margin: 0;
-}
-
-.identity-card {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 16px 18px;
-    margin-bottom: 14px;
-    background: var(--genrx-blue-soft);
-    border: 1px solid var(--genrx-border);
-    border-radius: var(--genrx-radius);
-}
-
-.identity-avatar {
-    width: 48px;
-    height: 48px;
-    border-radius: 8px;
-    background: var(--genrx-blue);
-    color: #FFFFFF;
+.profile-layout {
     display: grid;
-    place-items: center;
-    font-size: 20px;
-    font-weight: 700;
-    flex-shrink: 0;
+    grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
+    gap: 48px;
+    align-items: start;
 }
 
-.identity-name {
-    margin: 0;
-    font-size: 16px;
-    font-weight: 700;
-}
-
-.identity-meta {
-    margin: 2px 0 0;
-    color: var(--genrx-muted);
-    font-size: 12.5px;
-}
-
-.identity-badge {
-    margin-left: auto;
-    padding: 3px 7px;
-    border-radius: 4px;
+.profile-aside {
+    min-width: 0;
+    position: sticky;
+    top: 24px;
+    padding: 22px;
     background: var(--genrx-surface);
     border: 1px solid var(--genrx-border);
-    color: var(--genrx-blue-dark);
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.07em;
-    text-transform: uppercase;
+    border-radius: var(--genrx-radius);
+    box-shadow: var(--genrx-shadow);
 }
 
-.profile-form {
-    display: block;
-}
-
-.form-heading {
-    margin-bottom: 18px;
-    padding-bottom: 12px;
+.identity-block {
+    padding-bottom: 18px;
     border-bottom: 1px solid var(--genrx-border);
 }
 
-.form-heading h2 {
-    margin: 0;
-    font-size: 16px;
-    letter-spacing: -0.01em;
+.identity-avatar {
+    display: grid;
+    place-items: center;
+    width: 52px;
+    height: 52px;
+    border-radius: 8px;
+    background: var(--genrx-accent);
+    color: var(--genrx-on-accent);
+    font-family: var(--genrx-font-display);
+    font-size: 24px;
+    font-weight: 600;
 }
 
-.form-heading p {
+.identity-name {
+    margin: 14px 0 0;
+    font-family: var(--genrx-font-display);
+    font-size: 22px;
+    font-weight: 600;
+    line-height: 1.15;
+    letter-spacing: -0.015em;
+    overflow-wrap: anywhere;
+}
+
+.identity-email {
     margin: 3px 0 0;
     color: var(--genrx-muted);
     font-size: 12.5px;
+    overflow-wrap: anywhere;
 }
 
-@media (max-width: 480px) {
-    .identity-badge {
-        display: none;
+.identity-facts {
+    margin: 0;
+    padding: 16px 0 0;
+}
+
+.identity-facts div {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 7px 0;
+}
+
+.identity-facts dt {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--genrx-muted);
+}
+
+.identity-facts dd {
+    margin: 0;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--genrx-ink);
+    text-align: right;
+}
+
+.aside-footnote {
+    margin: 16px 0 0;
+    padding-top: 14px;
+    border-top: 1px solid var(--genrx-border);
+    color: var(--genrx-muted);
+    font-size: 12px;
+    line-height: 1.55;
+}
+
+/* ---------- Form ---------- */
+.profile-main {
+    min-width: 0;
+}
+
+.profile-form {
+    max-width: 620px;
+    margin-top: 24px;
+}
+
+.form-note {
+    color: var(--genrx-muted);
+    font-size: 12px;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 900px) {
+    .profile-layout {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+
+    .profile-aside {
+        position: static;
+    }
+}
+
+@media (max-width: 640px) {
+    .profile-aside {
+        padding: 18px;
+    }
+
+    .profile-form {
+        margin-top: 18px;
     }
 }

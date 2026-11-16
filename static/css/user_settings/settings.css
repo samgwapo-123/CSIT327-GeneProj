@@ -1,48 +1,126 @@
-/* Settings page: appearance and notification preferences. */
+/* Settings: an index on the left, one ruled settings sheet on the right. */
 
-.greeting-block {
-    margin-bottom: 22px;
+.settings-layout {
+    display: grid;
+    grid-template-columns: minmax(200px, 260px) minmax(0, 1fr);
+    gap: 48px;
+    align-items: start;
 }
 
-.message-list {
+/* ---------- Section index ---------- */
+.settings-index {
+    position: sticky;
+    top: 24px;
+    min-width: 0;
+}
+
+.settings-index .eyebrow {
     margin-bottom: 14px;
 }
 
-.message-list .alert {
-    margin: 0;
+.index-nav {
+    display: grid;
+    border-top: 1px solid var(--genrx-border);
 }
 
-.settings-card {
-    margin-bottom: 14px;
+.index-nav a {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    padding: 11px 0;
+    border-bottom: 1px solid var(--genrx-border);
+    color: var(--genrx-ink-soft);
+    font-size: 13.5px;
+    font-weight: 600;
+    text-decoration: none;
 }
 
-.settings-card .btn {
-    margin-top: 14px;
+.index-nav a:hover {
+    color: var(--genrx-accent-ink);
 }
 
-.card-heading {
-    margin-bottom: 14px;
-    padding-bottom: 12px;
+.index-nav a:focus-visible {
+    outline: 2px solid var(--genrx-accent-strong);
+    outline-offset: 3px;
+    border-radius: 4px;
+}
+
+.index-number {
+    font-family: var(--genrx-font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--genrx-muted);
+}
+
+.index-note {
+    margin: 16px 0 0;
+    color: var(--genrx-muted);
+    font-size: 12px;
+    line-height: 1.55;
+}
+
+.index-note strong {
+    color: var(--genrx-ink);
+}
+
+/* ---------- Sheet ---------- */
+.settings-main {
+    min-width: 0;
+}
+
+.settings-sheet {
+    max-width: 640px;
+}
+
+.sheet-section {
+    padding: 0 0 24px;
+    margin-bottom: 26px;
     border-bottom: 1px solid var(--genrx-border);
 }
 
-.card-heading h2 {
-    margin: 0;
-    font-size: 16px;
-    letter-spacing: -0.01em;
+.sheet-section:first-child {
+    padding-top: 2px;
 }
 
-.card-heading p {
-    margin: 3px 0 0;
+.sheet-heading {
+    display: grid;
+    grid-template-columns: 34px minmax(0, 1fr);
+    gap: 14px;
+    margin-bottom: 20px;
+}
+
+.sheet-number {
+    padding-top: 5px;
+    font-family: var(--genrx-font-mono);
+    font-size: 10px;
+    font-weight: 700;
     color: var(--genrx-muted);
-    font-size: 12.5px;
+}
+
+.sheet-heading h2 {
+    margin: 0;
+    font-family: var(--genrx-font-display);
+    font-size: 25px;
+    font-weight: 600;
+    line-height: 1.15;
+    letter-spacing: -0.015em;
+}
+
+.sheet-heading p {
+    margin: 5px 0 0;
+    max-width: 56ch;
+    color: var(--genrx-muted);
+    font-size: 13px;
+    line-height: 1.55;
 }
 
 .setting-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 16px;
+    gap: 20px;
+    padding: 16px 0;
+    border-top: 1px solid var(--genrx-border);
 }
 
 .setting-info {
@@ -58,9 +136,18 @@
 
 .setting-desc {
     margin-top: 2px;
-    font-size: 12px;
     color: var(--genrx-muted);
-    line-height: 1.4;
+    font-size: 12px;
+    line-height: 1.45;
+}
+
+.preview-status {
+    margin: 12px 0 0;
+    font-family: var(--genrx-font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: var(--genrx-accent-ink);
 }
 
 .settings-note {
@@ -69,14 +156,15 @@
     border-top: 1px solid var(--genrx-border);
     color: var(--genrx-muted);
     font-size: 12px;
+    line-height: 1.55;
 }
 
-/* Squared toggle, not a pill. Track and knob use the shared corner sizes. */
+/* ---------- Squared switch ---------- */
 .switch {
     position: relative;
     display: inline-block;
-    width: 42px;
-    height: 24px;
+    width: 44px;
+    height: 26px;
     flex-shrink: 0;
 }
 
@@ -90,10 +178,11 @@
 .slider {
     position: absolute;
     inset: 0;
-    background: var(--genrx-border);
-    border-radius: 6px;
+    background: var(--genrx-border-strong);
+    border: 1px solid var(--genrx-border-strong);
+    border-radius: 5px;
     cursor: pointer;
-    transition: background-color 0.15s ease;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
 }
 
 .slider::before {
@@ -103,14 +192,16 @@
     height: 18px;
     left: 3px;
     top: 3px;
-    background: #FFFFFF;
-    border-radius: 4px;
-    box-shadow: 0 1px 3px rgba(18, 40, 58, 0.25);
-    transition: transform 0.15s ease;
+    background: var(--genrx-surface);
+    border: 1px solid var(--genrx-border-strong);
+    border-radius: 3px;
+    box-shadow: 0 1px 2px rgba(16, 42, 58, 0.2);
+    transition: transform 0.15s ease, background-color 0.15s ease;
 }
 
 .switch input:checked + .slider {
-    background: var(--genrx-blue);
+    background: var(--genrx-accent);
+    border-color: var(--genrx-accent-strong);
 }
 
 .switch input:checked + .slider::before {
@@ -122,8 +213,68 @@
     box-shadow: var(--genrx-focus);
 }
 
-.history-card {
-    margin-top: 18px;
+/* ---------- Actions and history link ---------- */
+.settings-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 18px;
+    margin-top: 26px;
+    padding-top: 20px;
+    border-top: 1px solid var(--genrx-border);
+}
+
+.form-note {
+    color: var(--genrx-muted);
+    font-size: 12px;
+}
+
+.sheet-section--link {
+    max-width: 640px;
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: 0;
+}
+
+.sheet-section--link .sheet-heading {
+    margin-bottom: 12px;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 900px) {
+    .settings-layout {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+
+    .settings-index {
+        position: static;
+    }
+
+    .index-nav {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0 18px;
+    }
+}
+
+@media (max-width: 640px) {
+    .index-nav {
+        grid-template-columns: 1fr;
+    }
+
+    .sheet-heading {
+        grid-template-columns: 26px minmax(0, 1fr);
+        gap: 10px;
+    }
+
+    .setting-row {
+        align-items: flex-start;
+    }
+
+    .settings-actions .btn {
+        width: 100%;
+    }
 }
 
 @media (prefers-reduced-motion: reduce) {

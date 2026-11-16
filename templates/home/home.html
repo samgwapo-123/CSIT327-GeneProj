@@ -1,49 +1,32 @@
+{% extends "shared/base.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home - GeneRX</title>
-    <link rel="stylesheet" href="{% static 'css/shared/theme.css' %}">
-    <link rel="stylesheet" href="{% static 'css/home/home.css' %}">
-</head>
-<body class="genrx{% if genrx_settings.dark_mode %} dark-mode{% endif %}">
-<div class="genrx-shell">
 
-    <header class="genrx-top">
-        <a class="genrx-brand" href="{% url 'home:home' %}">
-            <span class="genrx-brand-mark" aria-hidden="true">Rx</span>
-            <span>
-                <span class="genrx-brand-name">GeneRX</span>
-                <span class="genrx-brand-tag">Generic medicine finder</span>
-            </span>
-        </a>
+{% block title %}Search · GeneRX{% endblock %}
 
-        <nav class="genrx-nav" aria-label="Main navigation">
-            <a href="{% url 'home:home' %}" class="is-current" aria-current="page">Search</a>
-            <a href="{% url 'pharmacies:list' %}">Pharmacies</a>
-            <a href="{% url 'scans:scan' %}">Scan</a>
-            <a href="{% url 'user_profile:profile' %}">Profile</a>
-            <a href="{% url 'user_settings:settings' %}">Settings</a>
-            <form method="post" action="{% url 'login:logout' %}" class="logout-form">
-                {% csrf_token %}
-                <button type="submit">Log out</button>
-            </form>
-            <span class="genrx-avatar" title="{{ username }}">{{ username|slice:":1"|upper }}</span>
-        </nav>
-    </header>
+{% block page_css %}
+<link rel="stylesheet" href="{% static 'css/home/home.css' %}?v=4">
+{% endblock %}
 
-    <main>
-        <div class="greeting-block">
-            <h1 class="page-title">Hello, {{ username }}</h1>
-            <p class="page-subtitle">Search a brand name to compare generic equivalents. Prices are sample data for this class project, not official MDRP prices.</p>
-        </div>
+{% block content %}
+<section class="masthead">
+    <p class="eyebrow">Medicine reference · sample data</p>
+    <h1 class="display-title">Find the generic<br>behind the <em>brand</em>.</h1>
+    <p class="lead">Hello, {{ username }}. Search a brand name to compare generic equivalents, then check which sample pharmacy lists it in stock.</p>
+    <div class="masthead-meta">
+        <span>Prices are sample data, not official MDRP prices.</span>
+        <span>NTI medicines need a pharmacist's check.</span>
+    </div>
+</section>
 
-        <section class="card lookup-card" aria-labelledby="lookup-title">
+<div class="home-layout">
+    <div class="home-main">
+        <section class="lookup" aria-labelledby="lookup-title">
             <div class="lookup-head">
-                <h2 id="lookup-title">Medicine lookup</h2>
-                <p>Search by brand name or generic name.</p>
+                <div>
+                    <p class="eyebrow">Lookup</p>
+                    <h2 id="lookup-title" class="lookup-title">Medicine lookup</h2>
+                </div>
+                <p class="lookup-note">Search by brand or generic name.</p>
             </div>
 
             <div class="lookup-tabs" role="tablist" aria-label="Lookup method">
@@ -51,30 +34,41 @@
                 <button type="button" class="lookup-tab" id="scanTab" role="tab" aria-selected="false" aria-controls="scanPanel">Scan medicine</button>
             </div>
 
-            <div class="lookup-panel" id="searchPanel" role="tabpanel" aria-labelledby="searchTab">
+            <div class="lookup-body" id="searchPanel" role="tabpanel" aria-labelledby="searchTab">
                 <label class="sr-only" for="medicineSearch">Medicine name</label>
-                <div class="search-row">
+                <div class="search-field">
+                    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+                        <circle cx="11" cy="11" r="7"></circle>
+                        <path d="M16.5 16.5 21 21"></path>
+                    </svg>
                     <input type="search" id="medicineSearch" placeholder="Type a brand or generic name, e.g. Biogesic" autocomplete="off" aria-describedby="searchHelp">
                     <span class="search-spinner" id="searchSpinner" hidden aria-hidden="true"></span>
                 </div>
                 <p class="help" id="searchHelp">Try Biogesic, Losartan, or Coumadin.</p>
             </div>
 
-            <div class="lookup-panel" id="scanPanel" role="tabpanel" aria-labelledby="scanTab" hidden>
-                <p class="scan-note">The scan page accepts a prescription photo and a typed medicine name. OCR is not connected yet, so the typed name does the matching.</p>
-                <a class="btn btn-secondary scan-link" href="{% url 'scans:scan' %}">Open scan page</a>
+            <div class="lookup-body" id="scanPanel" role="tabpanel" aria-labelledby="scanTab" hidden>
+                <div class="scan-tab-note">
+                    <p>The scan page accepts a prescription photo and a typed medicine name. OCR is not connected yet, so the typed name does the matching.</p>
+                    <a class="btn btn-secondary" href="{% url 'scans:scan' %}">Open scan page</a>
+                </div>
             </div>
         </section>
 
-        <p class="section-label" id="resultsLabel" aria-live="polite">Type a medicine name above</p>
-        <div id="resultsArea" aria-live="polite">
-            <div class="empty-state">Start typing to see matching medicines.</div>
-        </div>
+        <section class="results-section" id="resultsSection" aria-labelledby="resultsLabel">
+            <div class="section-heading">
+                <h2 id="resultsLabel" class="section-title" aria-live="polite">Type a medicine name above</h2>
+                <span class="section-hint">Max 10 results</span>
+            </div>
+            <div id="resultsArea" aria-live="polite">
+                <div class="empty-state"><strong>No medicine selected.</strong> Start with the brand name printed on the box.</div>
+            </div>
+        </section>
 
-        <section class="card detail-card" id="detailArea" hidden aria-labelledby="detailTitle">
+        <section class="detail-panel" id="detailArea" hidden aria-labelledby="detailTitle">
             <div class="detail-header">
-                <button type="button" class="back-btn" id="backBtn" aria-label="Back to search results">&#8592;</button>
-                <div>
+                <button type="button" class="back-btn" id="backBtn"><span aria-hidden="true">&larr;</span> Back to results</button>
+                <div class="detail-heading">
                     <h2 class="detail-title" id="detailTitle"></h2>
                     <p class="detail-sub" id="detailSub"></p>
                 </div>
@@ -83,24 +77,64 @@
             <div class="detail-meta" id="detailMeta"></div>
             <div id="detailWarning"></div>
 
-            <p class="section-label">Generic alternatives</p>
+            <div class="generic-head" aria-hidden="true">
+                <span>Generic brand</span>
+                <span>Manufacturer</span>
+                <span>Sample price</span>
+            </div>
             <div class="generic-list" id="genericList"></div>
 
             <div class="detail-actions" id="detailActions" hidden>
-                <a class="btn btn-primary btn-block" id="pharmacyLink" href="{% url 'pharmacies:list' %}">Find pharmacies with this medicine</a>
+                <a class="btn btn-primary" id="pharmacyLink" href="{% url 'pharmacies:list' %}">Find pharmacies with this medicine</a>
+                <a class="text-link" href="{% url 'home:home' %}">Search another medicine</a>
             </div>
         </section>
 
         <noscript>
             <p class="alert alert-warning">Medicine search needs JavaScript. Please enable it in your browser.</p>
         </noscript>
-    </main>
+    </div>
 
-    <footer class="genrx-footer">
-        GeneRX sample data for CSIT327. Not medical advice. Confirm any switch with your pharmacist or doctor.
-    </footer>
+    <aside class="home-aside">
+        <section class="aside-block" aria-labelledby="how-title">
+            <p class="eyebrow">How it works</p>
+            <h2 id="how-title" class="aside-title">Three steps</h2>
+            <ol class="step-list">
+                <li>
+                    <span class="step-number">01</span>
+                    <div>
+                        <strong>Search the brand</strong>
+                        <p>Type the name printed on the box or prescription.</p>
+                    </div>
+                </li>
+                <li>
+                    <span class="step-number">02</span>
+                    <div>
+                        <strong>Compare generics</strong>
+                        <p>Open a result to see alternatives and sample prices.</p>
+                    </div>
+                </li>
+                <li>
+                    <span class="step-number">03</span>
+                    <div>
+                        <strong>Check stock</strong>
+                        <p>Find a sample pharmacy and open directions.</p>
+                    </div>
+                </li>
+            </ol>
+        </section>
+
+        <section class="aside-note" aria-labelledby="before-title">
+            <p class="eyebrow">Before you switch</p>
+            <h2 id="before-title" class="aside-title">Same ingredient, different brand</h2>
+            <p>Generics contain the same active ingredient, but narrow therapeutic index (NTI) medicines need a pharmacist's check before switching.</p>
+            <a class="text-link" href="{% url 'pharmacies:list' %}">Open the pharmacy locator <span aria-hidden="true">&rarr;</span></a>
+        </section>
+    </aside>
 </div>
+{% endblock %}
 
+{% block scripts %}
 <script>
     // Django builds the URLs once; home.js only fetches data from them.
     window.GENRX_URLS = {
@@ -109,6 +143,5 @@
         pharmacies: "{% url 'pharmacies:list' %}"
     };
 </script>
-<script src="{% static 'js/home/home.js' %}"></script>
-</body>
-</html>
+<script src="{% static 'js/home/home.js' %}?v=4"></script>
+{% endblock %}

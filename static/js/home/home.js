@@ -11,6 +11,7 @@
     var searchPanel = document.getElementById("searchPanel");
     var scanPanel = document.getElementById("scanPanel");
     var resultsLabel = document.getElementById("resultsLabel");
+    var resultsSection = document.getElementById("resultsSection");
     var resultsArea = document.getElementById("resultsArea");
     var detailArea = document.getElementById("detailArea");
     var detailTitle = document.getElementById("detailTitle");
@@ -69,11 +70,13 @@
 
     function setSearching(isSearching) {
         searchSpinner.hidden = !isSearching;
+        resultsArea.setAttribute("aria-busy", String(isSearching));
     }
 
     function hideDetail() {
         detailArea.hidden = true;
         detailActions.hidden = true;
+        resultsSection.hidden = false;
         resultsArea.hidden = false;
         resultsLabel.hidden = false;
     }
@@ -99,16 +102,16 @@
         if (!Array.isArray(results) || results.length === 0) {
             resultsLabel.textContent = "No matches found";
             resultsArea.innerHTML =
-                '<div class="empty-state">No medicine matched &ldquo;' +
+                '<div class="empty-state"><strong>No medicine matched &ldquo;' +
                 escapeHtml(query) +
-                '&rdquo;. Try a brand name or a generic name.</div>';
+                '&rdquo;.</strong> Try a brand name or a generic name.</div>';
             return;
         }
 
         resultsLabel.textContent =
             results.length + (results.length === 1 ? " medicine found" : " medicines found");
 
-        var cards = results.map(function (medicine) {
+        var rows = results.map(function (medicine) {
             var badge = medicine.rx_required
                 ? '<span class="badge badge-rx">Rx</span>'
                 : '<span class="badge badge-otc">OTC</span>';
@@ -118,26 +121,29 @@
                 : "";
 
             return (
-                '<article class="result-card">' +
+                '<article class="result-row">' +
                     '<div class="result-main">' +
-                        '<h3 class="result-name">' + escapeHtml(medicine.brand_name) + "</h3>" +
+                        '<div class="result-head">' +
+                            '<h3 class="result-name">' + escapeHtml(medicine.brand_name) + "</h3>" +
+                            badge +
+                        "</div>" +
                         '<p class="result-generic">' +
                             escapeHtml(medicine.generic_name) + " &middot; " + escapeHtml(medicine.dosage) +
                         "</p>" +
-                        '<p class="result-price">Sample MDRP &#8369;' + escapeHtml(formatPrice(medicine.mdrp_price)) + "</p>" +
+                        '<p class="result-price">' +
+                            '<span class="price-label">Sample MDRP</span>' +
+                            '<span class="price-value">&#8369;' + escapeHtml(formatPrice(medicine.mdrp_price)) + "</span>" +
+                        "</p>" +
                         warning +
                     "</div>" +
-                    '<div class="result-side">' +
-                        badge +
-                        '<button type="button" class="btn btn-secondary result-button" data-medicine-id="' +
-                            escapeHtml(medicine.id) +
-                        '">View generics</button>' +
-                    "</div>" +
+                    '<button type="button" class="text-link result-action" data-medicine-id="' +
+                        escapeHtml(medicine.id) +
+                    '">View generics <span aria-hidden="true">&rarr;</span></button>' +
                 "</article>"
             );
         });
 
-        resultsArea.innerHTML = '<div class="result-list">' + cards.join("") + "</div>";
+        resultsArea.innerHTML = '<div class="result-list">' + rows.join("") + "</div>";
     }
 
     async function handleSearch() {
@@ -148,7 +154,8 @@
 
         if (!query) {
             resultsLabel.textContent = "Type a medicine name above";
-            resultsArea.innerHTML = '<div class="empty-state">Start typing to see matching medicines.</div>';
+            resultsArea.innerHTML =
+                '<div class="empty-state"><strong>No medicine selected.</strong> Start with the brand name printed on the box.</div>';
             setSearching(false);
             return;
         }
@@ -191,11 +198,14 @@
         detailSub.textContent = medicine.generic_name + " \u00b7 " + medicine.dosage;
 
         detailMeta.innerHTML =
-            "<span>Manufacturer <strong>" + escapeHtml(medicine.manufacturer) + "</strong></span>" +
-            "<span>Status <strong>" +
-                (medicine.rx_required ? "Prescription (Rx)" : "Over the counter (OTC)") +
-            "</strong></span>" +
-            "<span>Sample MDRP <strong>&#8369;" + escapeHtml(formatPrice(medicine.mdrp_price)) + "</strong></span>";
+            '<div class="meta-item"><span class="meta-label">Manufacturer</span>' +
+                '<span class="meta-value">' + escapeHtml(medicine.manufacturer) + "</span></div>" +
+            '<div class="meta-item"><span class="meta-label">Status</span>' +
+                '<span class="meta-value">' +
+                    (medicine.rx_required ? "Prescription (Rx)" : "Over the counter (OTC)") +
+                "</span></div>" +
+            '<div class="meta-item"><span class="meta-label">Sample MDRP</span>' +
+                '<span class="meta-value">&#8369;' + escapeHtml(formatPrice(medicine.mdrp_price)) + "</span></div>";
 
         detailWarning.innerHTML = medicine.nti_warning
             ? '<div class="alert alert-warning" role="alert"><strong>NTI warning.</strong> ' +
@@ -214,11 +224,9 @@
 
         genericList.innerHTML = generics.map(function (generic) {
             return (
-                '<div class="generic-card">' +
-                    "<div>" +
-                        '<p class="generic-name">' + escapeHtml(generic.name) + "</p>" +
-                        '<p class="generic-maker">' + escapeHtml(generic.manufacturer) + "</p>" +
-                    "</div>" +
+                '<div class="generic-row">' +
+                    '<p class="generic-name">' + escapeHtml(generic.name) + "</p>" +
+                    '<p class="generic-maker">' + escapeHtml(generic.manufacturer) + "</p>" +
                     '<p class="generic-price">&#8369;' + escapeHtml(formatPrice(generic.price)) + "</p>" +
                 "</div>"
             );
@@ -227,6 +235,7 @@
 
     async function loadGenerics(medicineId) {
         detailArea.hidden = false;
+        resultsSection.hidden = true;
         resultsArea.hidden = true;
         resultsLabel.hidden = true;
 
@@ -236,6 +245,13 @@
         detailWarning.innerHTML = "";
         detailActions.hidden = true;
         genericList.innerHTML = '<p class="loading-state">Loading generic alternatives...</p>';
+
+        // Bring the detail view into view on narrow screens.
+        var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        detailArea.scrollIntoView({
+            behavior: reduceMotion ? "auto" : "smooth",
+            block: "start"
+        });
 
         try {
             var data = await fetchJson(genericsUrl(medicineId));
@@ -263,9 +279,21 @@
         showTab("scan");
     });
 
+    // Arrow keys move between the two lookup tabs.
+    document.querySelector(".lookup-tabs").addEventListener("keydown", function (event) {
+        if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") {
+            return;
+        }
+
+        event.preventDefault();
+        var nextTab = searchTab.classList.contains("is-active") ? scanTab : searchTab;
+        nextTab.focus();
+        nextTab.click();
+    });
+
     backBtn.addEventListener("click", hideDetail);
 
-    // Click delegation keeps working for cards created after the page loaded.
+    // Click delegation keeps working for rows created after the page loaded.
     resultsArea.addEventListener("click", function (event) {
         var button = event.target.closest("[data-medicine-id]");
 
