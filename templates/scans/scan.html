@@ -1,0 +1,170 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scan medicine - GeneRX</title>
+    <link rel="stylesheet" href="{% static 'css/shared/theme.css' %}">
+    <link rel="stylesheet" href="{% static 'css/scans/scan.css' %}">
+</head>
+<body class="genrx{% if genrx_settings.dark_mode %} dark-mode{% endif %}">
+<div class="genrx-shell">
+
+    <header class="genrx-top">
+        <a class="genrx-brand" href="{% url 'home:home' %}">
+            <span class="genrx-brand-mark" aria-hidden="true">Rx</span>
+            <span>
+                <span class="genrx-brand-name">GeneRX</span>
+                <span class="genrx-brand-tag">Generic medicine finder</span>
+            </span>
+        </a>
+
+        <nav class="genrx-nav" aria-label="Main navigation">
+            <a href="{% url 'home:home' %}">Search</a>
+            <a href="{% url 'pharmacies:list' %}">Pharmacies</a>
+            <a href="{% url 'scans:scan' %}" class="is-current" aria-current="page">Scan</a>
+            <a href="{% url 'scans:history' %}">History</a>
+            <a href="{% url 'user_profile:profile' %}">Profile</a>
+            <a href="{% url 'user_settings:settings' %}">Settings</a>
+            <form method="post" action="{% url 'login:logout' %}" class="logout-form">
+                {% csrf_token %}
+                <button type="submit">Log out</button>
+            </form>
+            <span class="genrx-avatar" title="{{ request.user.username }}">{{ request.user.username|slice:":1"|upper }}</span>
+        </nav>
+    </header>
+
+    <main>
+        <div class="greeting-block">
+            <h1 class="page-title">Scan medicine</h1>
+            <p class="page-subtitle">Upload a prescription photo and/or type the medicine name. We match it against the sample medicine list.</p>
+        </div>
+
+        <p class="alert alert-warning">
+            <strong>No real OCR yet.</strong> The image is stored but no text is read from it. Typing the name is what produces a match.
+        </p>
+
+        {% if messages %}
+            <div class="message-list">
+                {% for message in messages %}
+                    <p class="alert alert-success" role="status">{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% if error %}
+            <p class="alert alert-error" role="alert">{{ error }}</p>
+        {% endif %}
+
+        <form method="post" enctype="multipart/form-data" class="card scan-form">
+            {% csrf_token %}
+
+            <div class="field">
+                <label for="image">Prescription image (optional)</label>
+                <input type="file" id="image" name="image" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
+                <p class="help">JPG, PNG, or WebP. Maximum 5 MB. Saved to your private media folder.</p>
+            </div>
+
+            <div class="field">
+                <label for="medicine_name">Medicine name</label>
+                <input type="text" id="medicine_name" name="medicine_name" value="{{ typed_value }}" placeholder="e.g. Coumadin" autocomplete="off">
+                <p class="help">Use the brand name printed on the prescription or box.</p>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block">Check medicine</button>
+        </form>
+
+        {% if result %}
+            <section class="card result-card" aria-labelledby="result-title">
+                {% if result.status == "matched" %}
+                    <div class="result-heading">
+                        <span class="badge badge-high">High confidence</span>
+                        <h2 id="result-title">Match found</h2>
+                        <p>We are confident enough to save this match to your history.</p>
+                    </div>
+
+                    <div class="result-medicine">
+                        <div class="result-topline">
+                            <h3>{{ result.medicine.brand_name }}</h3>
+                            {% if result.medicine.rx_required %}
+                                <span class="badge badge-rx">Rx</span>
+                            {% else %}
+                                <span class="badge badge-otc">OTC</span>
+                            {% endif %}
+                        </div>
+                        <p class="result-generic">{{ result.medicine.generic_name }} &middot; {{ result.medicine.dosage }}</p>
+                        <p class="result-confidence">{{ result.confidence|floatformat:1 }}% confidence</p>
+                        {% if result.medicine.nti_warning %}
+                            <p class="nti-note">NTI: narrow therapeutic index. Ask a pharmacist before switching brands.</p>
+                        {% endif %}
+                    </div>
+
+                    <div class="result-actions">
+                        <a class="btn btn-primary" href="{% url 'home:home' %}?medicine={{ result.medicine.id }}">View generic alternatives</a>
+                        <a class="btn btn-secondary" href="{% url 'pharmacies:list' %}?medicine={{ result.medicine.id }}">Find pharmacies</a>
+                        <a class="btn btn-quiet" href="{% url 'scans:history' %}">Open scan history</a>
+                    </div>
+
+                {% elif result.status == "confirm" %}
+                    <div class="result-heading">
+                        <span class="badge badge-mid">Needs confirmation</span>
+                        <h2 id="result-title">Is this the right medicine?</h2>
+                        <p>The name is close, but not close enough to save automatically.</p>
+                    </div>
+
+                    <div class="result-medicine">
+                        <div class="result-topline">
+                            <h3>{{ result.medicine.brand_name }}</h3>
+                            {% if result.medicine.rx_required %}
+                                <span class="badge badge-rx">Rx</span>
+                            {% else %}
+                                <span class="badge badge-otc">OTC</span>
+                            {% endif %}
+                        </div>
+                        <p class="result-generic">{{ result.medicine.generic_name }} &middot; {{ result.medicine.dosage }}</p>
+                        <p class="result-confidence">{{ result.confidence|floatformat:1 }}% confidence</p>
+                    </div>
+
+                    <form method="post" action="{% url 'scans:confirm' result.scan.id %}" class="confirm-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="medicine_id" value="{{ result.medicine.id }}">
+                        <button type="submit" class="btn btn-primary">Yes, use {{ result.medicine.brand_name }}</button>
+                        <a class="btn btn-secondary" href="{% url 'scans:scan' %}">Not this medicine</a>
+                    </form>
+
+                {% else %}
+                    <div class="result-heading">
+                        <span class="badge badge-low">No match</span>
+                        <h2 id="result-title">We need a clearer name</h2>
+                        {% if result.message %}
+                            <p>{{ result.message }}</p>
+                        {% else %}
+                            <p>No medicine was close enough to the text you entered.</p>
+                        {% endif %}
+                    </div>
+
+                    <p class="result-confidence">{{ result.confidence|floatformat:1 }}% best confidence</p>
+
+                    <div class="result-actions">
+                        <a class="btn btn-primary" href="{% url 'home:home' %}">Search manually</a>
+                        <a class="btn btn-secondary" href="{% url 'scans:scan' %}">Try another image or name</a>
+                    </div>
+                {% endif %}
+
+                {% if result.image_url %}
+                    <figure class="scan-preview">
+                        <img src="{{ result.image_url }}" alt="Uploaded prescription image">
+                        <figcaption>Stored under your account. OCR is not reading this image yet.</figcaption>
+                    </figure>
+                {% endif %}
+            </section>
+        {% endif %}
+    </main>
+
+    <footer class="genrx-footer">
+        GeneRX stores sample scans for CSIT327. Do not upload real medical records you would not share with a class demo.
+    </footer>
+</div>
+</body>
+</html>

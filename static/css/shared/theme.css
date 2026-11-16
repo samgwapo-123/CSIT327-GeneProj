@@ -1,0 +1,430 @@
+/* ============================================================
+   GeneRX shared theme
+   Design tokens and shell pieces reused by every signed-in page.
+   Palette: baby blue #4FA8D1, page background #EEF6FB,
+   white cards, 10px corners, no pill-shaped controls.
+   ============================================================ */
+
+:root {
+    --genrx-blue: #4FA8D1;
+    --genrx-blue-dark: #2E7FA6;
+    --genrx-blue-soft: #E4F2FA;
+    --genrx-bg: #EEF6FB;
+    --genrx-surface: #FFFFFF;
+    --genrx-subtle: #F5FAFD;
+    --genrx-ink: #12283A;
+    --genrx-muted: #5A7285;
+    --genrx-border: #D8E6F0;
+    --genrx-danger: #B42318;
+    --genrx-danger-soft: #FDECEA;
+    --genrx-success: #1B6B45;
+    --genrx-success-soft: #E7F6EE;
+    --genrx-warning: #8A5A00;
+    --genrx-warning-soft: #FFF4DF;
+    --genrx-radius: 10px;
+    --genrx-radius-sm: 6px;
+    --genrx-shadow: 0 1px 2px rgba(18, 40, 58, 0.05), 0 10px 28px rgba(18, 40, 58, 0.06);
+    --genrx-font: "Segoe UI", "Trebuchet MS", Arial, sans-serif;
+    --genrx-mono: "Cascadia Mono", Consolas, monospace;
+    --genrx-focus: 0 0 0 3px rgba(79, 168, 209, 0.28);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+[hidden] {
+    display: none !important;
+}
+
+html {
+    -webkit-text-size-adjust: 100%;
+}
+
+body.genrx {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--genrx-bg);
+    color: var(--genrx-ink);
+    font-family: var(--genrx-font);
+    font-size: 15px;
+    line-height: 1.5;
+}
+
+/* Dark theme is opt-in from Settings. Only the tokens change. */
+body.genrx.dark-mode {
+    --genrx-bg: #0E1B24;
+    --genrx-surface: #14283A;
+    --genrx-subtle: #102230;
+    --genrx-ink: #E8F3FB;
+    --genrx-muted: #9DB4C7;
+    --genrx-border: #264257;
+    --genrx-blue-soft: #1A3A50;
+    --genrx-danger-soft: #3B1D1B;
+    --genrx-success-soft: #123629;
+    --genrx-warning-soft: #3A2A10;
+    --genrx-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 28px rgba(0, 0, 0, 0.28);
+}
+
+/* ---------- Page shell ---------- */
+.genrx-shell {
+    width: min(920px, calc(100% - 32px));
+    margin: 0 auto;
+    padding: 22px 0 56px;
+}
+
+/* ---------- Top bar ---------- */
+.genrx-top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--genrx-border);
+    margin-bottom: 30px;
+}
+
+.genrx-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: inherit;
+    text-decoration: none;
+}
+
+.genrx-brand-mark {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    background: var(--genrx-blue);
+    color: #FFFFFF;
+    display: grid;
+    place-items: center;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    flex-shrink: 0;
+}
+
+.genrx-brand-name {
+    display: block;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    line-height: 1.15;
+}
+
+.genrx-brand-tag {
+    display: block;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--genrx-muted);
+}
+
+.genrx-nav {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 2px;
+}
+
+.genrx-nav a,
+.genrx-nav button {
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--genrx-muted);
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    padding: 8px 10px;
+    border-radius: var(--genrx-radius-sm);
+    cursor: pointer;
+}
+
+.genrx-nav a:hover,
+.genrx-nav button:hover {
+    color: var(--genrx-ink);
+    background: var(--genrx-surface);
+}
+
+.genrx-nav a.is-current {
+    color: var(--genrx-blue-dark);
+    background: var(--genrx-surface);
+    border-color: var(--genrx-border);
+}
+
+.genrx-nav a:focus-visible,
+.genrx-nav button:focus-visible {
+    outline: 2px solid var(--genrx-blue-dark);
+    outline-offset: 2px;
+}
+
+.genrx-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: var(--genrx-blue);
+    color: #FFFFFF;
+    display: grid;
+    place-items: center;
+    font-size: 13px;
+    font-weight: 700;
+    margin-left: 6px;
+}
+
+.logout-form {
+    display: inline;
+    margin: 0;
+}
+
+/* ---------- Cards ---------- */
+.card {
+    background: var(--genrx-surface);
+    border: 1px solid var(--genrx-border);
+    border-radius: var(--genrx-radius);
+    box-shadow: var(--genrx-shadow);
+    padding: 22px;
+}
+
+.section-label {
+    margin: 26px 0 10px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--genrx-muted);
+}
+
+.page-title {
+    margin: 0 0 6px;
+    font-size: clamp(24px, 3.4vw, 30px);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    font-weight: 700;
+}
+
+.page-subtitle {
+    margin: 0;
+    color: var(--genrx-muted);
+    font-size: 14px;
+    max-width: 64ch;
+}
+
+/* ---------- Buttons ---------- */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 40px;
+    padding: 0 14px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.1s ease;
+}
+
+.btn:active {
+    transform: translateY(1px);
+}
+
+.btn:focus-visible {
+    outline: none;
+    box-shadow: var(--genrx-focus);
+}
+
+.btn-primary {
+    background: var(--genrx-blue);
+    color: #FFFFFF;
+}
+
+.btn-primary:hover {
+    background: var(--genrx-blue-dark);
+}
+
+.btn-secondary {
+    background: var(--genrx-surface);
+    color: var(--genrx-ink);
+    border-color: var(--genrx-border);
+}
+
+.btn-secondary:hover {
+    border-color: var(--genrx-blue);
+    color: var(--genrx-blue-dark);
+}
+
+.btn-quiet {
+    background: transparent;
+    color: var(--genrx-muted);
+}
+
+.btn-quiet:hover {
+    background: var(--genrx-subtle);
+    color: var(--genrx-ink);
+}
+
+.btn-block {
+    width: 100%;
+}
+
+.btn[disabled] {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+/* ---------- Forms ---------- */
+.field {
+    margin-bottom: 16px;
+}
+
+.field:last-child {
+    margin-bottom: 0;
+}
+
+.field label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--genrx-muted);
+}
+
+.field input,
+.field textarea,
+.field select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--genrx-border);
+    border-radius: 8px;
+    background: var(--genrx-surface);
+    color: var(--genrx-ink);
+    font: inherit;
+    font-size: 14px;
+}
+
+.field input:focus,
+.field textarea:focus,
+.field select:focus {
+    outline: none;
+    border-color: var(--genrx-blue);
+    box-shadow: var(--genrx-focus);
+}
+
+.field textarea {
+    min-height: 92px;
+    resize: vertical;
+}
+
+.field .help {
+    margin: 6px 0 0;
+    font-size: 12px;
+    color: var(--genrx-muted);
+}
+
+.field .error-text {
+    margin: 6px 0 0;
+    font-size: 12px;
+    color: var(--genrx-danger);
+}
+
+/* ---------- Alerts and feedback ---------- */
+.alert {
+    padding: 10px 12px;
+    border: 1px solid var(--genrx-border);
+    border-radius: 8px;
+    font-size: 13px;
+    background: var(--genrx-subtle);
+}
+
+.alert-error {
+    background: var(--genrx-danger-soft);
+    border-color: var(--genrx-danger);
+    color: var(--genrx-danger);
+}
+
+.alert-info {
+    background: var(--genrx-blue-soft);
+    border-color: var(--genrx-blue);
+    color: var(--genrx-blue-dark);
+}
+
+.alert-warning {
+    background: var(--genrx-warning-soft);
+    border-color: var(--genrx-warning);
+    color: var(--genrx-warning);
+}
+
+.alert-success {
+    background: var(--genrx-success-soft);
+    border-color: var(--genrx-success);
+    color: var(--genrx-success);
+}
+
+/* ---------- Empty state ---------- */
+.empty-state {
+    padding: 26px 16px;
+    border: 1px dashed var(--genrx-border);
+    border-radius: var(--genrx-radius);
+    background: var(--genrx-surface);
+    text-align: center;
+    color: var(--genrx-muted);
+    font-size: 14px;
+}
+
+/* ---------- Footer ---------- */
+.genrx-footer {
+    margin-top: 38px;
+    padding-top: 16px;
+    border-top: 1px solid var(--genrx-border);
+    color: var(--genrx-muted);
+    font-size: 12px;
+}
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Keep dark-mode text readable when the accent is used on dark surfaces. */
+body.genrx.dark-mode .genrx-nav a.is-current,
+body.genrx.dark-mode .alert-info {
+    color: #B9E2F5;
+}
+
+@media (max-width: 640px) {
+    .genrx-shell {
+        width: calc(100% - 24px);
+        padding-top: 16px;
+    }
+
+    .genrx-top {
+        gap: 12px;
+        margin-bottom: 22px;
+    }
+
+    .genrx-nav {
+        width: 100%;
+    }
+
+    .card {
+        padding: 18px;
+    }
+}
