@@ -13,11 +13,17 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Load variables from .env (DATABASE_URL lives there, not in this file)
 load_dotenv(BASE_DIR / ".env")
 
-SECRET_KEY = 'django-insecure-x4@_#(s$#z#9v%s%^4q__b287j68(t$gbb5vw5w%4quvtyj2hk'
+SECRET_KEY = os.environ.get("SECRET_KEY", "django-insecure-dev-only-change-me")
 
-DEBUG = True
+# "True", "1", "yes", or "on" turn debug on; anything else keeps it off.
+DEBUG = os.environ.get("DEBUG", "True").strip().lower() in {"1", "true", "yes", "on"}
 
-ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
+# Comma-separated list, for example: ALLOWED_HOSTS=127.0.0.1,localhost
+ALLOWED_HOSTS = [
+    host.strip()
+    for host in os.environ.get("ALLOWED_HOSTS", "127.0.0.1,localhost").split(",")
+    if host.strip()
+]
 
 
 # Application definition
@@ -64,6 +70,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'apps.user_settings.context_processors.genrx_settings',
             ],
         },
     },
@@ -111,6 +118,10 @@ USE_TZ = True
 # with a feature subfolder per app (per the vertical slicing guide).
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
+
+# Uploaded prescription images. Served by Django only while DEBUG is on.
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 

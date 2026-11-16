@@ -5,95 +5,104 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Settings - GeneRX</title>
-    <!-- ?v=2 forces browser to clear the old cache -->
-    <link rel="stylesheet" href="{% static 'css/user_settings/settings.css' %}?v=2">
+    <link rel="stylesheet" href="{% static 'css/shared/theme.css' %}">
+    <link rel="stylesheet" href="{% static 'css/user_settings/settings.css' %}">
 </head>
-<body>
-    <div class="container">
-        <!-- Top App Bar (Identical to Homescreen) -->
-        <div class="genrx-top">
-            <a href="{% url 'home:home' %}" class="menu-btn" title="Back to Home">←</a>
-            <div class="nav-links">
-                <a href="{% url 'user_profile:profile' %}">Profile</a>
-                <a href="{% url 'home:home' %}">Home</a>
-                <a href="{% url 'login:logout' %}">Logout</a>
-                <div class="avatar">{{ request.user.username|slice:":1"|upper }}</div>
-            </div>
+<body class="genrx{% if genrx_settings.dark_mode %} dark-mode{% endif %}">
+<div class="genrx-shell">
+
+    <header class="genrx-top">
+        <a class="genrx-brand" href="{% url 'home:home' %}">
+            <span class="genrx-brand-mark" aria-hidden="true">Rx</span>
+            <span>
+                <span class="genrx-brand-name">GeneRX</span>
+                <span class="genrx-brand-tag">Generic medicine finder</span>
+            </span>
+        </a>
+
+        <nav class="genrx-nav" aria-label="Main navigation">
+            <a href="{% url 'home:home' %}">Search</a>
+            <a href="{% url 'pharmacies:list' %}">Pharmacies</a>
+            <a href="{% url 'user_profile:profile' %}">Profile</a>
+            <a href="{% url 'user_settings:settings' %}" class="is-current" aria-current="page">Settings</a>
+            <form method="post" action="{% url 'login:logout' %}" class="logout-form">
+                {% csrf_token %}
+                <button type="submit">Log out</button>
+            </form>
+            <span class="genrx-avatar" title="{{ request.user.username }}">{{ request.user.username|slice:":1"|upper }}</span>
+        </nav>
+    </header>
+
+    <main>
+        <div class="greeting-block">
+            <h1 class="page-title">Settings</h1>
+            <p class="page-subtitle">Control how GeneRX looks and how your account behaves.</p>
         </div>
 
-        <!-- Header Block (Identical to 'Hey Test_123!') -->
-        <div class="greeting-block">
-            <h1>Settings</h1>
-            <p class="greeting-sub">PREFERENCES & CONTROLS</p>
-        </div>
+        {% if messages %}
+            <div class="message-list">
+                {% for message in messages %}
+                    <p class="alert alert-success" role="status">{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
 
         <form method="post">
             {% csrf_token %}
 
-            <!-- Inner Card 1: Medicine Preferences -->
-            <div class="inner-card">
-                <div class="card-header">
-                    <div class="card-icon-circle">💊</div>
-                    <div class="card-title">Medicine Lookup & Safety</div>
+            <section class="card settings-card" aria-labelledby="appearance-title">
+                <div class="card-heading">
+                    <h2 id="appearance-title">Appearance</h2>
+                    <p>Dark mode applies to every page you open while signed in.</p>
                 </div>
 
                 <div class="setting-row">
                     <div class="setting-info">
-                        <span class="setting-name">Prioritize Generics</span>
-                        <span class="setting-desc">Highlight affordable generic equivalents first</span>
+                        <span class="setting-name" id="dark-mode-label">Dark mode</span>
+                        <span class="setting-desc">Use a dark surface for low-light use.</span>
                     </div>
                     <label class="switch">
-                        <input type="checkbox" name="prefer_generics" {% if settings.prefer_generics %}checked{% endif %}>
-                        <span class="slider"></span>
+                        <input type="checkbox" name="dark_mode" aria-labelledby="dark-mode-label" {% if settings.dark_mode %}checked{% endif %}>
+                        <span class="slider" aria-hidden="true"></span>
                     </label>
+                </div>
+            </section>
+
+            <section class="card settings-card" aria-labelledby="notifications-title">
+                <div class="card-heading">
+                    <h2 id="notifications-title">Notifications</h2>
+                    <p>Email delivery is not implemented in this project. The preference is saved only.</p>
                 </div>
 
                 <div class="setting-row">
                     <div class="setting-info">
-                        <span class="setting-name">NTI Safety Warnings</span>
-                        <span class="setting-desc">Alert for Narrow Therapeutic Index medicines</span>
+                        <span class="setting-name" id="email-label">Email notifications</span>
+                        <span class="setting-desc">Keep the option on for a future email feature.</span>
                     </div>
                     <label class="switch">
-                        <input type="checkbox" name="nti_warnings" {% if settings.nti_warnings %}checked{% endif %}>
-                        <span class="slider"></span>
-                    </label>
-                </div>
-            </div>
-
-            <!-- Inner Card 2: App & Notifications -->
-            <p class="section-label">DISPLAY & NOTIFICATIONS</p>
-            <div class="inner-card">
-                <div class="card-header">
-                    <div class="card-icon-circle">⚙️</div>
-                    <div class="card-title">General Preferences</div>
-                </div>
-
-                <div class="setting-row">
-                    <div class="setting-info">
-                        <span class="setting-name">Dark Mode</span>
-                        <span class="setting-desc">Adjust display for low-light environments</span>
-                    </div>
-                    <label class="switch">
-                        <input type="checkbox" name="dark_mode" {% if settings.dark_mode %}checked{% endif %}>
-                        <span class="slider"></span>
+                        <input type="checkbox" name="email_notifications" aria-labelledby="email-label" {% if settings.email_notifications %}checked{% endif %}>
+                        <span class="slider" aria-hidden="true"></span>
                     </label>
                 </div>
 
-                <div class="setting-row">
-                    <div class="setting-info">
-                        <span class="setting-name">Email Notifications</span>
-                        <span class="setting-desc">Receive updates about medicine price changes</span>
-                    </div>
-                    <label class="switch">
-                        <input type="checkbox" name="email_notifications" {% if settings.email_notifications %}checked{% endif %}>
-                        <span class="slider"></span>
-                    </label>
-                </div>
-            </div>
+                <p class="settings-note">No email will be sent while this is a class project. Nothing is scheduled or queued.</p>
+            </section>
 
-            <!-- Submit Button (Matches 'Search Medicine' Button) -->
-            <button type="submit" class="action-btn-main">Save Changes</button>
+            <button type="submit" class="btn btn-primary btn-block">Save changes</button>
         </form>
-    </div>
+
+        <section class="card settings-card history-card" aria-labelledby="history-title">
+            <div class="card-heading">
+                <h2 id="history-title">Scan history</h2>
+                <p>Review the prescriptions you have scanned or typed in.</p>
+            </div>
+            <a class="btn btn-secondary" href="{% url 'scans:history' %}">Open scan history</a>
+        </section>
+    </main>
+
+    <footer class="genrx-footer">
+        GeneRX is a CSIT327 class project. Not medical advice.
+    </footer>
+</div>
 </body>
 </html>

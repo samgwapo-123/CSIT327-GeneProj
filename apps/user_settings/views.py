@@ -1,5 +1,7 @@
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
+
 from .models import UserSettings
 
 
@@ -11,6 +13,7 @@ def settings_view(request):
         settings_obj.dark_mode = request.POST.get("dark_mode") == "on"
         settings_obj.email_notifications = request.POST.get("email_notifications") == "on"
         settings_obj.save()
+        messages.success(request, "Settings saved.")
         return redirect("user_settings:settings")
 
     return render(request, "user_settings/settings.html", {"settings": settings_obj})

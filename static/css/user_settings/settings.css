@@ -1,271 +1,134 @@
-* {
-    box-sizing: border-box;
-}
+/* Settings page: appearance and notification preferences. */
 
-body {
-    font-family: 'Segoe UI', Arial, sans-serif;
-    margin: 0;
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    padding: 40px 16px;
-    background: radial-gradient(circle at 30% 20%, #2fb8b3, #0f6e72 70%);
-    background-attachment: fixed;
-    color: #333;
-}
-
-/* Identical White App Container */
-.container {
-    width: 440px;
-    max-width: 100%;
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border-radius: 28px;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
-    padding: 28px 24px;
-    text-align: left;
-    position: relative;
-    z-index: 2;
-}
-
-/* Top App Bar */
-.genrx-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 24px;
-}
-
-.menu-btn {
-    width: 42px;
-    height: 42px;
-    border-radius: 12px;
-    background: #ffffff;
-    border: 1px solid #edf2f7;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 16px;
-    font-weight: bold;
-    color: #0f6e72;
-    text-decoration: none;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.menu-btn:hover {
-    background: #f7fafc;
-    transform: translateY(-1px);
-}
-
-.nav-links {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.nav-links a {
-    color: #0f6e72;
-    font-size: 12px;
-    font-weight: bold;
-    text-decoration: none;
-    background: #ffffff;
-    border: 1px solid #edf2f7;
-    padding: 9px 14px;
-    border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-    transition: all 0.2s ease;
-}
-
-.nav-links a:hover {
-    background: #f7fafc;
-    transform: translateY(-1px);
-}
-
-.avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 12px;
-    background: linear-gradient(135deg, #1a9296, #0f6e72);
-    color: #ffffff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    font-size: 15px;
-    box-shadow: 0 4px 12px rgba(15, 110, 114, 0.3);
-}
-
-/* Greeting / Title Block */
 .greeting-block {
-    margin-bottom: 20px;
+    margin-bottom: 22px;
 }
 
-.greeting-block h1 {
-    font-size: 26px;
-    color: #1a202c;
-    margin: 0 0 4px 0;
-    font-weight: 700;
-    letter-spacing: -0.3px;
+.message-list {
+    margin-bottom: 14px;
 }
 
-.greeting-sub {
-    font-size: 11px;
-    letter-spacing: 0.8px;
-    color: #8898aa;
-    font-weight: 700;
-    text-transform: uppercase;
+.message-list .alert {
     margin: 0;
 }
 
-/* Sub-section Label */
-.section-label {
-    color: #718096;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.8px;
-    margin: 18px 0 8px 4px;
-    text-transform: uppercase;
-}
-
-/* Inner Cards */
-.inner-card {
-    background: #ffffff;
-    border: 1px solid #eef2f5;
-    border-radius: 18px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
-    padding: 18px 20px;
+.settings-card {
     margin-bottom: 14px;
 }
 
-.card-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
+.settings-card .btn {
+    margin-top: 14px;
+}
+
+.card-heading {
     margin-bottom: 14px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid #edf2f7;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--genrx-border);
 }
 
-.card-icon-circle {
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
-    background: linear-gradient(135deg, #1a9296, #0f6e72);
-    color: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 15px;
+.card-heading h2 {
+    margin: 0;
+    font-size: 16px;
+    letter-spacing: -0.01em;
 }
 
-.card-title {
-    font-size: 14px;
-    font-weight: 600;
-    color: #2d3748;
+.card-heading p {
+    margin: 3px 0 0;
+    color: var(--genrx-muted);
+    font-size: 12.5px;
 }
 
-/* Setting Rows */
 .setting-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 14px;
-    padding: 10px 0;
-    border-bottom: 1px solid #f7fafc;
-}
-
-.setting-row:last-child {
-    border-bottom: none;
-    padding-bottom: 2px;
+    gap: 16px;
 }
 
 .setting-info {
     display: flex;
     flex-direction: column;
+    min-width: 0;
 }
 
 .setting-name {
-    font-size: 13.5px;
+    font-size: 14px;
     font-weight: 600;
-    color: #2d3748;
 }
 
 .setting-desc {
-    font-size: 11px;
-    color: #718096;
     margin-top: 2px;
-    line-height: 1.35;
+    font-size: 12px;
+    color: var(--genrx-muted);
+    line-height: 1.4;
 }
 
-/* Modern iOS-Style Toggle Switches */
+.settings-note {
+    margin: 14px 0 0;
+    padding-top: 12px;
+    border-top: 1px solid var(--genrx-border);
+    color: var(--genrx-muted);
+    font-size: 12px;
+}
+
+/* Squared toggle, not a pill. Track and knob use the shared corner sizes. */
 .switch {
     position: relative;
     display: inline-block;
-    width: 44px;
+    width: 42px;
     height: 24px;
     flex-shrink: 0;
 }
 
 .switch input {
+    position: absolute;
     opacity: 0;
-    width: 0;
-    height: 0;
+    width: 1px;
+    height: 1px;
 }
 
 .slider {
     position: absolute;
+    inset: 0;
+    background: var(--genrx-border);
+    border-radius: 6px;
     cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #cbd5e1;
-    transition: 0.3s;
-    border-radius: 24px;
+    transition: background-color 0.15s ease;
 }
 
-.slider:before {
-    position: absolute;
+.slider::before {
     content: "";
-    height: 18px;
+    position: absolute;
     width: 18px;
+    height: 18px;
     left: 3px;
-    bottom: 3px;
-    background-color: white;
-    transition: 0.3s;
-    border-radius: 50%;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
+    top: 3px;
+    background: #FFFFFF;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(18, 40, 58, 0.25);
+    transition: transform 0.15s ease;
 }
 
-input:checked + .slider {
-    background: linear-gradient(135deg, #1a9296, #0f6e72);
+.switch input:checked + .slider {
+    background: var(--genrx-blue);
 }
 
-input:checked + .slider:before {
-    transform: translateX(20px);
+.switch input:checked + .slider::before {
+    transform: translateX(18px);
 }
 
-/* Main Action Button (Matches 'Search Medicine' Button) */
-.action-btn-main {
-    width: 100%;
-    background: linear-gradient(135deg, #1a9296, #0f6e72);
-    color: #ffffff;
-    border: none;
-    padding: 13px;
-    border-radius: 12px;
-    font-size: 14px;
-    font-weight: bold;
-    cursor: pointer;
-    margin-top: 10px;
-    box-shadow: 0 4px 14px rgba(15, 110, 114, 0.25);
-    transition: opacity 0.2s ease, transform 0.15s ease;
+.switch input:focus-visible + .slider {
+    outline: none;
+    box-shadow: var(--genrx-focus);
 }
 
-.action-btn-main:hover {
-    opacity: 0.94;
-    transform: translateY(-1px);
+.history-card {
+    margin-top: 18px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .slider,
+    .slider::before {
+        transition: none;
+    }
 }

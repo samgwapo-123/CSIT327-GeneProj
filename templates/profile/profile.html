@@ -5,63 +5,83 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profile - GeneRX</title>
-    <!-- ?v=2 forces your browser to bypass cached old styles -->
-    <link rel="stylesheet" href="{% static 'css/profile/profile.css' %}?v=2">
+    <link rel="stylesheet" href="{% static 'css/shared/theme.css' %}">
+    <link rel="stylesheet" href="{% static 'css/profile/profile.css' %}">
 </head>
-<body>
-    <div class="container">
-        <!-- Top App Bar (Identical to Home & Settings) -->
-        <div class="genrx-top">
-            <a href="{% url 'home:home' %}" class="menu-btn" title="Back to Home">←</a>
-            <div class="nav-links">
-                <a href="{% url 'home:home' %}">Home</a>
-                <a href="{% url 'user_settings:settings' %}">Settings</a>
-                <a href="{% url 'login:logout' %}">Logout</a>
-                <div class="avatar">{{ request.user.username|slice:":1"|upper }}</div>
-            </div>
-        </div>
+<body class="genrx{% if genrx_settings.dark_mode %} dark-mode{% endif %}">
+<div class="genrx-shell">
 
-        <!-- Greeting / Title Block -->
+    <header class="genrx-top">
+        <a class="genrx-brand" href="{% url 'home:home' %}">
+            <span class="genrx-brand-mark" aria-hidden="true">Rx</span>
+            <span>
+                <span class="genrx-brand-name">GeneRX</span>
+                <span class="genrx-brand-tag">Generic medicine finder</span>
+            </span>
+        </a>
+
+        <nav class="genrx-nav" aria-label="Main navigation">
+            <a href="{% url 'home:home' %}">Search</a>
+            <a href="{% url 'pharmacies:list' %}">Pharmacies</a>
+            <a href="{% url 'user_profile:profile' %}" class="is-current" aria-current="page">Profile</a>
+            <a href="{% url 'user_settings:settings' %}">Settings</a>
+            <form method="post" action="{% url 'login:logout' %}" class="logout-form">
+                {% csrf_token %}
+                <button type="submit">Log out</button>
+            </form>
+            <span class="genrx-avatar" title="{{ request.user.username }}">{{ request.user.username|slice:":1"|upper }}</span>
+        </nav>
+    </header>
+
+    <main>
         <div class="greeting-block">
-            <h1>My Profile</h1>
-            <p class="greeting-sub">ACCOUNT & PERSONAL INFO</p>
+            <h1 class="page-title">Your profile</h1>
+            <p class="page-subtitle">Keep your account details and health notes in one place.</p>
         </div>
 
-        <!-- Profile Hero Card (Preview Banner) -->
-        <div class="profile-hero-card">
-            <div class="hero-avatar">{{ request.user.username|slice:":1"|upper }}</div>
-            <div class="hero-details">
-                <span class="hero-username">@{{ request.user.username }}</span>
-                <span class="hero-badge">GeneRX Member</span>
+        {% if messages %}
+            <div class="message-list">
+                {% for message in messages %}
+                    <p class="alert alert-success" role="status">{{ message }}</p>
+                {% endfor %}
             </div>
-        </div>
+        {% endif %}
 
-        <form method="post">
+        <section class="identity-card" aria-label="Account summary">
+            <span class="identity-avatar" aria-hidden="true">{{ request.user.username|slice:":1"|upper }}</span>
+            <div>
+                <p class="identity-name">@{{ request.user.username }}</p>
+                <p class="identity-meta">{{ request.user.email|default:"No email saved" }}</p>
+            </div>
+            <span class="identity-badge">Member</span>
+        </section>
+
+        <form method="post" class="card profile-form">
             {% csrf_token %}
 
-            <!-- Inner Form Card -->
-            <div class="inner-card">
-                <div class="card-header">
-                    <div class="card-icon-circle">👤</div>
-                    <div class="card-title">Personal Details</div>
-                </div>
-
-                <div class="field-group">
-                    <label for="full_name">Full Name</label>
-                    <input type="text" id="full_name" name="full_name" value="{{ profile.full_name|default:'' }}" placeholder="e.g. Jane Doe">
-                </div>
-
-                <div class="field-group">
-                    <label for="bio">Bio & Health Notes</label>
-                    <textarea id="bio" name="bio" rows="4" placeholder="Add a short bio, known allergies, or prescription notes...">{{ profile.bio|default:'' }}</textarea>
-                </div>
+            <div class="form-heading">
+                <h2>Personal details</h2>
+                <p>These notes stay on your account and are not shared with pharmacies.</p>
             </div>
 
-            <!-- Main Submit Button -->
-            <button type="submit" class="action-btn-main">Save Profile</button>
-        </form>
-    </div>
+            <div class="field">
+                <label for="full_name">Full name</label>
+                <input type="text" id="full_name" name="full_name" value="{{ profile.full_name|default:'' }}" placeholder="e.g. Jane Doe" autocomplete="name">
+            </div>
 
-    <script src="{% static 'js/profile/profile.js' %}"></script>
+            <div class="field">
+                <label for="bio">Bio and health notes</label>
+                <textarea id="bio" name="bio" rows="5" placeholder="Known allergies, maintenance medicines, or notes for your next pharmacy visit.">{{ profile.bio|default:'' }}</textarea>
+                <p class="help">Do not store sensitive records here. This is a school project database.</p>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block">Save profile</button>
+        </form>
+    </main>
+
+    <footer class="genrx-footer">
+        GeneRX is a CSIT327 class project. Not medical advice.
+    </footer>
+</div>
 </body>
 </html>
