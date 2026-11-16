@@ -1,0 +1,128 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pharmacies - GeneRX</title>
+    <link rel="stylesheet" href="{% static 'css/shared/theme.css' %}">
+    <link rel="stylesheet" href="{% static 'css/pharmacies/list.css' %}">
+</head>
+<body class="genrx{% if genrx_settings.dark_mode %} dark-mode{% endif %}">
+<div class="genrx-shell">
+
+    <header class="genrx-top">
+        <a class="genrx-brand" href="{% url 'home:home' %}">
+            <span class="genrx-brand-mark" aria-hidden="true">Rx</span>
+            <span>
+                <span class="genrx-brand-name">GeneRX</span>
+                <span class="genrx-brand-tag">Generic medicine finder</span>
+            </span>
+        </a>
+
+        <nav class="genrx-nav" aria-label="Main navigation">
+            <a href="{% url 'home:home' %}">Search</a>
+            <a href="{% url 'pharmacies:list' %}" class="is-current" aria-current="page">Pharmacies</a>
+            <a href="{% url 'user_profile:profile' %}">Profile</a>
+            <a href="{% url 'user_settings:settings' %}">Settings</a>
+            <form method="post" action="{% url 'login:logout' %}" class="logout-form">
+                {% csrf_token %}
+                <button type="submit">Log out</button>
+            </form>
+            <span class="genrx-avatar" title="{{ request.user.username }}">{{ request.user.username|slice:":1"|upper }}</span>
+        </nav>
+    </header>
+
+    <main>
+        <div class="greeting-block">
+            <h1 class="page-title">Pharmacy locator</h1>
+            <p class="page-subtitle">Sample Cebu City pharmacies. Choose a medicine to see its stock status, then open directions in Google Maps.</p>
+        </div>
+
+        <section class="card filter-card" aria-labelledby="filter-title">
+            <h2 id="filter-title">Check stock</h2>
+            <form method="get" class="filter-form">
+                <div class="field">
+                    <label for="medicine">Medicine</label>
+                    <select id="medicine" name="medicine">
+                        <option value="">All pharmacies (no stock column)</option>
+                        {% for medicine in medicines %}
+                            <option value="{{ medicine.id }}" {% if selected_medicine and selected_medicine.id == medicine.id %}selected{% endif %}>
+                                {{ medicine.brand_name }} — {{ medicine.generic_name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Show stock</button>
+            </form>
+            {% if selected_medicine %}
+                <p class="filter-note">Stock shown for <strong>{{ selected_medicine.brand_name }}</strong> ({{ selected_medicine.generic_name }}).</p>
+            {% else %}
+                <p class="filter-note">No medicine selected, so stock is hidden. Pick one above to compare pharmacies.</p>
+            {% endif %}
+        </section>
+
+        <div class="sort-bar">
+            <div class="sort-actions" role="group" aria-label="Sort pharmacies">
+                <button type="button" class="btn btn-secondary" id="sortAz">Sort A-Z</button>
+                <button type="button" class="btn btn-primary" id="sortNearest">Nearest first</button>
+            </div>
+            <p class="sort-status" id="sortStatus" aria-live="polite">Sorted alphabetically.</p>
+        </div>
+
+        <div class="pharmacy-list" id="pharmacyList">
+            {% for row in pharmacy_rows %}
+                <article class="pharmacy-card"
+                         data-latitude="{{ row.pharmacy.latitude }}"
+                         data-longitude="{{ row.pharmacy.longitude }}">
+                    <div class="pharmacy-main">
+                        <div class="pharmacy-topline">
+                            <h2>{{ row.pharmacy.name }}</h2>
+                            {% if selected_medicine %}
+                                {% if row.stock is None %}
+                                    <span class="badge badge-unlisted">Not listed</span>
+                                {% elif row.stock %}
+                                    <span class="badge badge-instock">In stock</span>
+                                {% else %}
+                                    <span class="badge badge-outstock">Out of stock</span>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+
+                        <p class="pharmacy-address">{{ row.pharmacy.address }}</p>
+
+                        <dl class="pharmacy-facts">
+                            <div>
+                                <dt>Hours</dt>
+                                <dd>{{ row.pharmacy.operating_hours|default:"Not provided" }}</dd>
+                            </div>
+                            <div>
+                                <dt>Contact</dt>
+                                <dd>{{ row.pharmacy.contact_number|default:"Not provided" }}</dd>
+                            </div>
+                        </dl>
+
+                        <p class="pharmacy-distance" data-distance hidden></p>
+                    </div>
+
+                    <div class="pharmacy-actions">
+                        <a class="btn btn-secondary"
+                           href="https://www.google.com/maps/dir/?api=1&amp;destination={{ row.pharmacy.latitude }},{{ row.pharmacy.longitude }}"
+                           target="_blank"
+                           rel="noopener noreferrer">Get directions</a>
+                    </div>
+                </article>
+            {% empty %}
+                <div class="empty-state">No pharmacies have been added yet. Run the seed command to load sample data.</div>
+            {% endfor %}
+        </div>
+    </main>
+
+    <footer class="genrx-footer">
+        Pharmacy details and stock are sample data for CSIT327. Call ahead before travelling.
+    </footer>
+</div>
+
+<script src="{% static 'js/pharmacies/list.js' %}"></script>
+</body>
+</html>

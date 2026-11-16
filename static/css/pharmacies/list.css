@@ -1,0 +1,181 @@
+/* Pharmacy locator: stock filter, alphabetical list, optional geolocation sort. */
+
+.greeting-block {
+    margin-bottom: 22px;
+}
+
+/* ---------- Medicine filter ---------- */
+.filter-card h2 {
+    margin: 0 0 14px;
+    font-size: 16px;
+    letter-spacing: -0.01em;
+}
+
+.filter-form {
+    display: flex;
+    align-items: flex-end;
+    gap: 12px;
+}
+
+.filter-form .field {
+    flex: 1;
+    margin-bottom: 0;
+}
+
+.filter-form .btn {
+    flex-shrink: 0;
+}
+
+.filter-note {
+    margin: 14px 0 0;
+    padding-top: 12px;
+    border-top: 1px solid var(--genrx-border);
+    color: var(--genrx-muted);
+    font-size: 13px;
+}
+
+/* ---------- Sort controls ---------- */
+.sort-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin: 20px 0 12px;
+}
+
+.sort-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.sort-status {
+    margin: 0;
+    color: var(--genrx-muted);
+    font-size: 12.5px;
+}
+
+/* ---------- Pharmacy cards ---------- */
+.pharmacy-list {
+    display: grid;
+    gap: 12px;
+}
+
+.pharmacy-card {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 18px 20px;
+    background: var(--genrx-surface);
+    border: 1px solid var(--genrx-border);
+    border-radius: var(--genrx-radius);
+    box-shadow: var(--genrx-shadow);
+}
+
+.pharmacy-main {
+    min-width: 0;
+}
+
+.pharmacy-topline {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+}
+
+.pharmacy-topline h2 {
+    margin: 0;
+    font-size: 16px;
+    letter-spacing: -0.01em;
+}
+
+.pharmacy-address {
+    margin: 3px 0 0;
+    color: var(--genrx-muted);
+    font-size: 13px;
+}
+
+.pharmacy-facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 26px;
+    margin: 12px 0 0;
+}
+
+.pharmacy-facts div {
+    display: flex;
+    gap: 6px;
+    align-items: baseline;
+}
+
+.pharmacy-facts dt {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--genrx-muted);
+}
+
+.pharmacy-facts dd {
+    margin: 0;
+    font-size: 12.5px;
+    color: var(--genrx-ink);
+}
+
+.pharmacy-distance {
+    margin: 10px 0 0;
+    color: var(--genrx-blue-dark);
+    font-size: 12.5px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+.pharmacy-actions {
+    flex-shrink: 0;
+    padding-top: 2px;
+}
+
+/* ---------- Stock badges ---------- */
+.badge {
+    display: inline-block;
+    padding: 3px 7px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.badge-instock {
+    background: var(--genrx-success-soft);
+    color: var(--genrx-success);
+}
+
+.badge-outstock {
+    background: var(--genrx-danger-soft);
+    color: var(--genrx-danger);
+}
+
+.badge-unlisted {
+    background: var(--genrx-subtle);
+    color: var(--genrx-muted);
+    border: 1px solid var(--genrx-border);
+}
+
+@media (max-width: 640px) {
+    .filter-form {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .pharmacy-card {
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .pharmacy-actions,
+    .pharmacy-actions .btn {
+        width: 100%;
+    }
+}
