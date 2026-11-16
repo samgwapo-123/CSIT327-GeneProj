@@ -1,0 +1,110 @@
+{% load static %}
+{% get_media_prefix as MEDIA_PREFIX %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scan history - GeneRX</title>
+    <link rel="stylesheet" href="{% static 'css/shared/theme.css' %}">
+    <link rel="stylesheet" href="{% static 'css/scans/history.css' %}">
+</head>
+<body class="genrx{% if genrx_settings.dark_mode %} dark-mode{% endif %}">
+<div class="genrx-shell">
+
+    <header class="genrx-top">
+        <a class="genrx-brand" href="{% url 'home:home' %}">
+            <span class="genrx-brand-mark" aria-hidden="true">Rx</span>
+            <span>
+                <span class="genrx-brand-name">GeneRX</span>
+                <span class="genrx-brand-tag">Generic medicine finder</span>
+            </span>
+        </a>
+
+        <nav class="genrx-nav" aria-label="Main navigation">
+            <a href="{% url 'home:home' %}">Search</a>
+            <a href="{% url 'pharmacies:list' %}">Pharmacies</a>
+            <a href="{% url 'scans:history' %}" class="is-current" aria-current="page">History</a>
+            <a href="{% url 'user_profile:profile' %}">Profile</a>
+            <a href="{% url 'user_settings:settings' %}">Settings</a>
+            <form method="post" action="{% url 'login:logout' %}" class="logout-form">
+                {% csrf_token %}
+                <button type="submit">Log out</button>
+            </form>
+            <span class="genrx-avatar" title="{{ request.user.username }}">{{ request.user.username|slice:":1"|upper }}</span>
+        </nav>
+    </header>
+
+    <main>
+        <div class="greeting-block">
+            <h1 class="page-title">Scan history</h1>
+            <p class="page-subtitle">Only your own scans appear here. Newest entries are first.</p>
+        </div>
+
+        {% if scans %}
+            <div class="history-list">
+                {% for scan in scans %}
+                    <article class="history-item">
+                        <div class="history-when">
+                            <time datetime="{{ scan.created_at|date:'c' }}">{{ scan.created_at|date:"M j, Y" }}</time>
+                            <span>{{ scan.created_at|date:"g:i A" }}</span>
+                        </div>
+
+                        <div class="history-block">
+                            <span class="history-label">Typed input</span>
+                            <p>{{ scan.extracted_text|default:"No text entered" }}</p>
+                        </div>
+
+                        <div class="history-block">
+                            <span class="history-label">Matched medicine</span>
+                            {% if scan.matched_medicine %}
+                                <p>
+                                    <strong>{{ scan.matched_medicine.brand_name }}</strong><br>
+                                    <span class="history-muted">{{ scan.matched_medicine.generic_name }}</span>
+                                </p>
+                            {% else %}
+                                <p class="history-muted">No match saved</p>
+                            {% endif %}
+                        </div>
+
+                        <div class="history-block">
+                            <span class="history-label">Confidence</span>
+                            {% if scan.confidence_score is not None %}
+                                {% if scan.confidence_score >= 90 %}
+                                    <span class="badge badge-high">{{ scan.confidence_score|floatformat:2 }}%</span>
+                                {% elif scan.confidence_score >= 70 %}
+                                    <span class="badge badge-mid">{{ scan.confidence_score|floatformat:2 }}%</span>
+                                {% else %}
+                                    <span class="badge badge-low">{{ scan.confidence_score|floatformat:2 }}%</span>
+                                {% endif %}
+                            {% else %}
+                                <p class="history-muted">Not scored</p>
+                            {% endif %}
+                        </div>
+
+                        <div class="history-action">
+                            {% if scan.matched_medicine %}
+                                <a class="btn btn-secondary" href="{% url 'pharmacies:list' %}?medicine={{ scan.matched_medicine.id }}">Find pharmacies</a>
+                            {% else %}
+                                <a class="btn btn-secondary" href="{% url 'home:home' %}">Search manually</a>
+                            {% endif %}
+                            {% if scan.image_path %}
+                                <a class="btn btn-quiet" href="{{ MEDIA_PREFIX }}{{ scan.image_path }}" target="_blank" rel="noopener">View image</a>
+                            {% endif %}
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state">
+                No scans yet. Open the scan page to upload a prescription image or type a medicine name.
+            </div>
+        {% endif %}
+    </main>
+
+    <footer class="genrx-footer">
+        Scan history is private to your account in this demo. Images and text are sample storage only.
+    </footer>
+</div>
+</body>
+</html>
