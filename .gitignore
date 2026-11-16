@@ -5,3 +5,7 @@ __pycache__/
 *.pyc
 db.sqlite3
 media/
+
+# AI agent / design notes (local only)
+AGENTS.md
+UI_DESIGN_GUIDELINES.md
