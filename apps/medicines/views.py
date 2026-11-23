@@ -1,3 +1,5 @@
+from decimal import Decimal, ROUND_HALF_UP
+
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.http import JsonResponse
@@ -48,15 +50,37 @@ def generics_view(request, medicine_id):
     # Cheapest generic alternative first helps the user compare quickly.
     alternatives = medicine.generic_alternatives.all().order_by("price")
 
-    generics = [
-        {
+    medicine_price = medicine.mdrp_price
+    generics = []
+
+    for alternative in alternatives:
+        savings = None
+        savings_percent = None
+
+        # Decimal keeps money exact; a brand price of 0 has nothing to save.
+        if medicine_price > 0:
+            difference = (medicine_price - alternative.price).quantize(Decimal("0.01"))
+            if difference > 0:
+                savings = str(difference)
+                savings_percent = int(
+                    (difference / medicine_price * Decimal("100")).quantize(
+                        Decimal("1"), rounding=ROUND_HALF_UP
+                    )
+                )
+
+        generics.append({
             "id": alternative.id,
             "name": alternative.generic_brand_name,
             "manufacturer": alternative.manufacturer,
             "price": str(alternative.price),
-        }
-        for alternative in alternatives
-    ]
+            "savings": savings,
+            "savings_percent": savings_percent,
+            "lowest_price": False,
+        })
+
+    # A single generic is simply the only option, not a "lowest price" pick.
+    if len(generics) > 1:
+        generics[0]["lowest_price"] = True
 
     return JsonResponse({
         "medicine": _medicine_data(medicine),
