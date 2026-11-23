@@ -73,3 +73,107 @@ class MedicineEndpointTests(TestCase):
     def test_unknown_medicine_returns_404(self):
         response = self.client.get(reverse("medicines:generics", args=[99999]))
         self.assertEqual(response.status_code, 404)
+
+    def test_generic_saving_is_computed(self):
+        response = self.client.get(
+            reverse("medicines:generics", args=[self.medicine.id])
+        )
+
+        generic = response.json()["generics"][0]
+        self.assertEqual(generic["savings"], "2.50")
+        self.assertEqual(generic["savings_percent"], 50)
+
+    def test_no_saving_when_generic_costs_same_or_more(self):
+        medicine = Medicine.objects.create(
+            brand_name="No Savings Brand",
+            generic_name="No Savings Generic",
+            dosage="1 mg tablet",
+            manufacturer="Test Labs",
+            mdrp_price="5.00",
+        )
+        GenericAlternative.objects.create(
+            medicine=medicine,
+            generic_brand_name="Same Price",
+            manufacturer="Test Labs",
+            price="5.00",
+        )
+        GenericAlternative.objects.create(
+            medicine=medicine,
+            generic_brand_name="Higher Price",
+            manufacturer="Test Labs",
+            price="6.00",
+        )
+
+        response = self.client.get(
+            reverse("medicines:generics", args=[medicine.id])
+        )
+
+        for generic in response.json()["generics"]:
+            self.assertIsNone(generic["savings"])
+            self.assertIsNone(generic["savings_percent"])
+
+    def test_generics_are_sorted_by_price_and_lowest_is_flagged(self):
+        medicine = Medicine.objects.create(
+            brand_name="Sorted Brand",
+            generic_name="Sorted Generic",
+            dosage="1 mg tablet",
+            manufacturer="Test Labs",
+            mdrp_price="10.00",
+        )
+        for name, price in [
+            ("Middle", "6.00"),
+            ("Cheapest", "4.00"),
+            ("Most Expensive", "8.00"),
+        ]:
+            GenericAlternative.objects.create(
+                medicine=medicine,
+                generic_brand_name=name,
+                manufacturer="Test Labs",
+                price=price,
+            )
+
+        response = self.client.get(
+            reverse("medicines:generics", args=[medicine.id])
+        )
+
+        generics = response.json()["generics"]
+        self.assertEqual(
+            [generic["price"] for generic in generics],
+            ["4.00", "6.00", "8.00"],
+        )
+        self.assertTrue(generics[0]["lowest_price"])
+        self.assertFalse(generics[1]["lowest_price"])
+        self.assertFalse(generics[2]["lowest_price"])
+
+    def test_single_generic_is_not_flagged_as_lowest(self):
+        response = self.client.get(
+            reverse("medicines:generics", args=[self.medicine.id])
+        )
+
+        generics = response.json()["generics"]
+        self.assertEqual(len(generics), 1)
+        self.assertFalse(generics[0]["lowest_price"])
+
+    def test_zero_mdrp_price_returns_no_saving(self):
+        medicine = Medicine.objects.create(
+            brand_name="Zero Price Brand",
+            generic_name="Zero Price Generic",
+            dosage="1 mg tablet",
+            manufacturer="Test Labs",
+            mdrp_price="0.00",
+        )
+        GenericAlternative.objects.create(
+            medicine=medicine,
+            generic_brand_name="Zero Price Alternative",
+            manufacturer="Test Labs",
+            price="1.00",
+        )
+
+        response = self.client.get(
+            reverse("medicines:generics", args=[medicine.id])
+        )
+
+        self.assertEqual(response.status_code, 200)
+        generic = response.json()["generics"][0]
+        self.assertIsNone(generic["savings"])
+        self.assertIsNone(generic["savings_percent"])
