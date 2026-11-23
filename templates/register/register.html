@@ -1,56 +1,78 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="genrx{% if genrx_settings.dark_mode %} dark-mode{% endif %}">
 <head>
     <meta charset="UTF-8">
-    <title>Register - GeneRX</title>
-    <link rel="stylesheet" href="{% static 'css/register/register.css' %}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Create a GeneRX account for the CSIT327 generic medicine finder.">
+    <title>Create account - GeneRX</title>
+    <link rel="stylesheet" href="{% static 'css/shared/theme.css' %}?v=4">
+    <link rel="stylesheet" href="{% static 'css/register/register.css' %}?v=4">
 </head>
-<body>
-    <!-- Decorative background elements (purely visual) -->
-    <div class="bg-circle c1">🧬</div>
-    <div class="bg-circle c2">💗</div>
-    <div class="bg-circle c3">🩺</div>
+<body class="genrx{% if genrx_settings.dark_mode %} dark-mode{% endif %}">
+<a class="skip-link" href="#main-content">Skip to content</a>
 
-    <div class="container">
-        <div class="logo-icon">✚</div>
-        <h1>Create Account!</h1>
+<div class="genrx-shell auth-shell">
+    <header class="auth-brand">
+        <a class="genrx-brand" href="{% url 'home:home' %}">
+            <span class="genrx-brand-mark" aria-hidden="true">Rx</span>
+            <span class="genrx-brand-text">
+                <span class="genrx-brand-name">GeneRX</span>
+                <span class="genrx-brand-tag">Generic medicine finder</span>
+            </span>
+        </a>
+    </header>
 
-        {% if errors %}
-            {% for error in errors %}
-                <p class="error-msg">{{ error }}</p>
-            {% endfor %}
-        {% endif %}
+    <main id="main-content" class="auth-main">
+        <section class="masthead masthead--compact auth-masthead">
+            <p class="eyebrow">New account</p>
+            <h1 class="display-title">Create your <em>account</em>.</h1>
+            <p class="lead">Register to save your profile, preferences, and scan history in one place.</p>
+        </section>
 
-        <form method="post">
-            {% csrf_token %}
-            <div class="field">
-                <label>Username</label>
-                <input type="text" name="username" placeholder="Choose a username" value="{{ username }}" required>
-                <span class="field-icon"></span>
-            </div>
-            <div class="field">
-                <label>Email</label>
-                <input type="email" name="email" placeholder="Enter your email" value="{{ email }}" required>
-                <span class="field-icon"></span>
-            </div>
-            <div class="field">
-                <label>Password</label>
-                <input type="password" name="password" placeholder="Create a password" required>
-                <span class="field-icon"></span>
-            </div>
-            <div class="field">
-                <label>Confirm Password</label>
-                <input type="password" name="confirm_password" placeholder="Type the password again" required>
-                <span class="field-icon"></span>
-            </div>
-            <button type="submit">SIGN UP</button>
-        </form>
+        <section class="panel auth-panel" aria-labelledby="register-title">
+            <h2 id="register-title" class="section-title auth-title">Register</h2>
 
-        <div class="link-row">
-            Already have an account? <a href="{% url 'login:login' %}">Sign In</a>
-        </div>
-    </div>
-    <script src="{% static 'js/register/register.js' %}"></script>
+            {% if errors %}
+                {% for error in errors %}
+                    <p class="alert alert-error" role="alert">{{ error }}</p>
+                {% endfor %}
+            {% endif %}
+
+            <form method="post" class="auth-form">
+                {% csrf_token %}
+                <div class="field">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" placeholder="Choose a username" value="{{ username }}" autocomplete="username" required>
+                </div>
+                <div class="field">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" placeholder="Enter your email" value="{{ email }}" autocomplete="email" required>
+                </div>
+                <div class="field">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" placeholder="Create a password" autocomplete="new-password" required>
+                </div>
+                <div class="field">
+                    <label for="confirm_password">Confirm password</label>
+                    <input type="password" id="confirm_password" name="confirm_password" placeholder="Type the password again" autocomplete="new-password" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Create account</button>
+            </form>
+
+            <div class="auth-links">
+                <span>Already have an account?</span>
+                <a class="text-link" href="{% url 'login:login' %}">Sign in <span aria-hidden="true">&rarr;</span></a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="genrx-footer">
+        <span>GeneRX &middot; CSIT327 class project</span>
+        <span>Sample data, not medical advice.</span>
+    </footer>
+</div>
+
+<script src="{% static 'js/register/register.js' %}?v=4"></script>
 </body>
 </html>
