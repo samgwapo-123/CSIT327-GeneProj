@@ -223,11 +223,23 @@
         }
 
         genericList.innerHTML = generics.map(function (generic) {
+            var savingsBadge = "";
+            if (generic.savings !== null && generic.savings !== undefined) {
+                savingsBadge =
+                    ' <span class="badge badge-otc">Save &#8369;' +
+                    escapeHtml(formatPrice(generic.savings)) +
+                    " (" + escapeHtml(String(generic.savings_percent)) + "%)</span>";
+            }
+
+            var lowestBadge = generic.lowest_price
+                ? ' <span class="badge badge-neutral">Lowest price</span>'
+                : "";
+
             return (
                 '<div class="generic-row">' +
                     '<p class="generic-name">' + escapeHtml(generic.name) + "</p>" +
                     '<p class="generic-maker">' + escapeHtml(generic.manufacturer) + "</p>" +
-                    '<p class="generic-price">&#8369;' + escapeHtml(formatPrice(generic.price)) + "</p>" +
+                    '<p class="generic-price">&#8369;' + escapeHtml(formatPrice(generic.price)) + savingsBadge + lowestBadge + "</p>" +
                 "</div>"
             );
         }).join("");
