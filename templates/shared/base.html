@@ -25,6 +25,7 @@
         <nav class="genrx-nav" aria-label="Main navigation">
             <a href="{% url 'home:home' %}"{% if request.path == '/' %} class="is-current" aria-current="page"{% endif %}>Search</a>
             <a href="{% url 'pharmacies:list' %}"{% if request.path == '/pharmacies/' %} class="is-current" aria-current="page"{% endif %}>Pharmacies</a>
+            <a href="{% url 'pharmacies:stock' %}"{% if request.path == '/pharmacies/stock/' %} class="is-current" aria-current="page"{% endif %}>Stock</a>
             <a href="{% url 'scans:scan' %}"{% if request.path == '/scans/' %} class="is-current" aria-current="page"{% endif %}>Scan</a>
             <a href="{% url 'scans:history' %}"{% if request.path == '/scans/history/' %} class="is-current" aria-current="page"{% endif %}>History</a>
             <a href="{% url 'user_profile:profile' %}"{% if request.path == '/profile/' %} class="is-current" aria-current="page"{% endif %}>Profile</a>

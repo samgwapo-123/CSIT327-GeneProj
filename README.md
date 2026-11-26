@@ -10,6 +10,8 @@ The app uses plain Django function-based views, Django templates, and small vani
 - Search medicines by brand or generic name through JSON endpoints.
 - View generic alternatives with sample prices.
 - Filter a pharmacy list by medicine and see sample stock.
+- Browse the whole stock ledger (`/pharmacies/stock/`): one JOIN query pairs every stock row with its pharmacy and medicine.
+- Check the restock watch (`/pharmacies/restock/`): a SUBQUERY lists only the pharmacies with an out-of-stock item, and shows which medicine.
 - Sort pharmacies A-Z or nearest-first with browser geolocation.
 - Open Google Maps directions from a pharmacy's latitude and longitude.
 - Upload a prescription image (JPG, PNG, WebP, max 5 MB) and/or type a medicine name.
@@ -99,26 +101,29 @@ Open <http://127.0.0.1:8000/>. You will be sent to the login page; create an acc
 | `SECRET_KEY` | Django signing key. Use a long random value outside development. |
 | `DEBUG` | `True` for local work, `False` for anything public. |
 | `ALLOWED_HOSTS` | Comma-separated hosts, e.g. `127.0.0.1,localhost`. |
+| `CSRF_TRUSTED_ORIGINS` | Comma-separated origins allowed to POST, e.g. `http://127.0.0.1:8000,http://localhost:8000`. Add a LAN origin when testing from another device. |
 | `DATABASE_URL` | Supabase PostgreSQL connection string. Leave empty to use SQLite. |
 
 Never commit the real `.env` file. Only `.env.example` with placeholders belongs in Git.
 
 ## Run the tests on SQLite
 
+Tests should never run against Supabase. Django creates and drops a temporary `test_postgres` database, which is slow through the pooler and can fail while other sessions hold it open.
+
 PowerShell:
 
 ```powershell
-$env:DATABASE_URL=""
+$env:DJANGO_SQLITE="1"
 python manage.py test
 ```
 
-`load_dotenv` does not override an existing environment variable, so the empty value keeps the test run on SQLite even when `.env` contains a Supabase URL.
+Do **not** use `$env:DATABASE_URL=""` for this. Assigning an empty string in PowerShell deletes the variable, so `.env` loads the Supabase URL again and the tests run on your real project.
 
 Useful checks:
 
 ```powershell
 python manage.py check
-python manage.py test apps.medicines apps.scans
+$env:DJANGO_SQLITE="1"; python manage.py test apps.pharmacies
 ```
 
 ## URL map
@@ -129,6 +134,8 @@ python manage.py test apps.medicines apps.scans
 | `/medicines/search/?q=...` | JSON search, maximum 10 rows |
 | `/medicines/<id>/generics/` | JSON medicine and generic alternatives |
 | `/pharmacies/` | Pharmacy locator and stock filter |
+| `/pharmacies/stock/` | JOIN: full stock ledger, filterable by pharmacy and status |
+| `/pharmacies/restock/` | SUBQUERY: pharmacies with at least one out-of-stock item |
 | `/scans/` | Upload or type a medicine for matching |
 | `/scans/history/` | Current user's scan history |
 | `/scans/<id>/confirm/` | POST-only confirmation for a medium match |
@@ -152,6 +159,58 @@ python manage.py test apps.medicines apps.scans
 4. `find_best_match()` compares the typed name (or future OCR text) against every brand and generic name with `difflib.SequenceMatcher`.
 5. Confidence above 90 saves the match; 70-90 asks for confirmation; below 70 asks for manual entry.
 6. Every attempt creates a `PrescriptionScan` row, and history is filtered to `request.user`.
+
+## JOIN and SUBQUERY implementation
+
+Both features live in the `pharmacies` app and read the `pharmacy_stock` junction table.
+
+### JOIN: `/pharmacies/stock/`
+
+`apps/pharmacies/views.py` → `stock_ledger_view()`:
+
+```python
+listings = PharmacyStock.objects.select_related("pharmacy", "medicine")
+```
+
+`select_related` makes Django emit two `INNER JOIN`s, so the pharmacy and medicine rows arrive with the stock row instead of one extra query per listing (36 listings, one query).
+
+```sql
+SELECT pharmacy_stock.*, pharmacies.*, medicines.*
+FROM pharmacy_stock
+INNER JOIN pharmacies ON pharmacy_stock.pharmacy_id = pharmacies.id
+INNER JOIN medicines  ON pharmacy_stock.medicine_id  = medicines.id
+ORDER BY pharmacies.name, medicines.brand_name;
+```
+
+### SUBQUERY: `/pharmacies/restock/`
+
+`apps/pharmacies/views.py` → `restock_watch_view()`:
+
+```python
+out_of_stock_pharmacy_ids = (
+    PharmacyStock.objects.filter(in_stock=False).values("pharmacy_id")
+)
+pharmacies = Pharmacy.objects.filter(id__in=Subquery(out_of_stock_pharmacy_ids))
+```
+
+The inner query collects `pharmacy_id` from out-of-stock rows. The outer query keeps only the pharmacies whose id is `IN` that result.
+
+```sql
+SELECT pharmacies.*
+FROM pharmacies
+WHERE pharmacies.id IN (
+    SELECT U0.pharmacy_id FROM pharmacy_stock U0 WHERE U0.in_stock = false
+)
+ORDER BY pharmacies.name;
+```
+
+### Showing the generated SQL
+
+```powershell
+python manage.py show_sql
+```
+
+It prints both statements and the row counts, which is useful for the demonstration video. The same two statements can be pasted into the Supabase SQL Editor.
 
 ## Sample data warning
 

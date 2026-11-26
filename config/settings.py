@@ -83,7 +83,14 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Falls back to local SQLite ONLY if DATABASE_URL is not set, so the
 # project can still run before you plug in your real Supabase credentials.
 
-if os.environ.get("DATABASE_URL"):
+# Set DJANGO_SQLITE=1 to force the local SQLite file, for example when
+# running the test suite. Clearing DATABASE_URL in PowerShell does not work:
+# assigning "" deletes the variable, so .env loads the Supabase URL again.
+USE_SQLITE = os.environ.get("DJANGO_SQLITE", "").strip().lower() in {
+    "1", "true", "yes", "on",
+}
+
+if os.environ.get("DATABASE_URL") and not USE_SQLITE:
     DATABASES = {
         "default": dj_database_url.parse(
             os.environ["DATABASE_URL"],
@@ -105,6 +112,28 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
     {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
+]
+
+
+# --- Cookies and CSRF ---------------------------------------------------
+# Browsers scope cookies by host, not by port, so every other Django project
+# served from 127.0.0.1 shares the default "csrftoken" and "sessionid" names.
+# A leftover cookie from another project (or from an earlier run with a
+# different SECRET_KEY) fails validation and causes
+# "CSRF token from POST incorrect". Unique names keep GeneRX's tokens apart.
+SESSION_COOKIE_NAME = "genrx_sessionid"
+CSRF_COOKIE_NAME = "genrx_csrftoken"
+
+# Origins allowed to submit POST forms when the app is opened through a LAN
+# address, for example http://192.168.1.20:8000 during a classroom demo.
+# Add hosts to ALLOWED_HOSTS as well, or the request is rejected first.
+CSRF_TRUSTED_ORIGINS = [
+    origin.strip()
+    for origin in os.environ.get(
+        "CSRF_TRUSTED_ORIGINS",
+        "http://127.0.0.1:8000,http://localhost:8000",
+    ).split(",")
+    if origin.strip()
 ]
 
 
