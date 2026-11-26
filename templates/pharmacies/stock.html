@@ -1,0 +1,83 @@
+{% extends "shared/base.html" %}
+{% load static %}
+
+{% block title %}Stock ledger · GeneRX{% endblock %}
+
+{% block page_css %}
+<link rel="stylesheet" href="{% static 'css/pharmacies/list.css' %}?v=4">
+<link rel="stylesheet" href="{% static 'css/pharmacies/stock.css' %}?v=1">
+{% endblock %}
+
+{% block content %}
+<section class="masthead masthead--compact">
+    <p class="eyebrow">Stock ledger · every listing</p>
+    <h1 class="display-title">One shelf list,<br>branch by <em>branch</em>.</h1>
+    <p class="lead">Each line pairs a stock record with the pharmacy that holds it and the medicine it describes, so the whole network is readable before you pick a medicine.</p>
+</section>
+
+<form method="get" class="ledger-bar" aria-label="Filter the stock ledger">
+    <div class="field">
+        <label for="pharmacy">Pharmacy</label>
+        <select id="pharmacy" name="pharmacy">
+            <option value="">All pharmacies</option>
+            {% for pharmacy in pharmacies %}
+                <option value="{{ pharmacy.id }}" {% if selected_pharmacy == pharmacy.id|stringformat:"s" %}selected{% endif %}>{{ pharmacy.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="field">
+        <label for="status">Status</label>
+        <select id="status" name="status">
+            <option value="">Any status</option>
+            <option value="in" {% if selected_status == "in" %}selected{% endif %}>In stock</option>
+            <option value="out" {% if selected_status == "out" %}selected{% endif %}>Out of stock</option>
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary btn-sm">Apply</button>
+
+    <div class="ledger-bar-meta">
+        <span class="ledger-total">{{ listings|length }} listing{{ listings|length|pluralize }}</span>
+        <a class="text-link" href="{% url 'pharmacies:restock' %}">Restock watch <span aria-hidden="true">&rarr;</span></a>
+    </div>
+</form>
+
+{% regroup listings by pharmacy as pharmacy_groups %}
+
+{% for group in pharmacy_groups %}
+    <section class="stock-group" aria-labelledby="pharmacy-{{ group.grouper.id }}">
+        <header class="stock-group-head">
+            <span class="stock-group-number" aria-hidden="true">{{ forloop.counter|stringformat:"02d" }}</span>
+            <div class="stock-group-title">
+                <h2 id="pharmacy-{{ group.grouper.id }}" class="pharmacy-name">{{ group.grouper.name }}</h2>
+                <p class="pharmacy-address">{{ group.grouper.address }}</p>
+            </div>
+            <span class="section-hint">{{ group.list|length }} medicine{{ group.list|length|pluralize }}</span>
+        </header>
+
+        <ul class="stock-items">
+            {% for listing in group.list %}
+                <li class="stock-line">
+                    <div class="stock-med">
+                        <strong>{{ listing.medicine.brand_name }}</strong>
+                        <span>{{ listing.medicine.generic_name }} · {{ listing.medicine.dosage }}</span>
+                    </div>
+                    <span class="stock-price">&#8369;{{ listing.medicine.mdrp_price }}</span>
+                    {% if listing.in_stock %}
+                        <span class="stock-state">In stock</span>
+                    {% else %}
+                        <span class="badge badge-outstock">Out of stock</span>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    </section>
+{% empty %}
+    <div class="empty-state">
+        <strong>No listings match that filter.</strong>
+        Clear the status or choose another pharmacy to see its shelves.
+        <p class="empty-action"><a class="btn btn-primary" href="{% url 'pharmacies:stock' %}">Show every listing</a></p>
+    </div>
+{% endfor %}
+{% endblock %}

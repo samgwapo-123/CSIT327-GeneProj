@@ -1,0 +1,205 @@
+/* Stock ledger and restock watch: a ruled toolbar over numbered branch
+   sections. Medicines read as an index of lines, not as stacked cards. */
+
+/* ---------- Toolbar ---------- */
+.ledger-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 14px 20px;
+    margin: 0 0 8px;
+    padding: 16px 0;
+    border-top: 1px solid var(--genrx-border);
+    border-bottom: 1px solid var(--genrx-border);
+}
+
+.ledger-bar .field {
+    flex: 0 1 260px;
+    min-width: 190px;
+    margin: 0;
+}
+
+.ledger-bar .field label {
+    font-size: 10px;
+}
+
+.ledger-bar .btn {
+    margin-bottom: 1px;
+}
+
+.ledger-bar-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 6px 18px;
+    margin-left: auto;
+    padding-bottom: 9px;
+}
+
+.ledger-total {
+    margin: 0;
+    font-family: var(--genrx-font-mono);
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--genrx-muted);
+}
+
+.ledger-bar--static {
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px 20px;
+    padding: 14px 0;
+}
+
+.ledger-bar--static strong {
+    font-size: 15px;
+    color: var(--genrx-ink);
+}
+
+/* ---------- Branch sections ---------- */
+.stock-group {
+    padding: 26px 0 6px;
+    border-top: 1px solid var(--genrx-border);
+}
+
+/* The toolbar above already draws a rule, so the first section skips one. */
+.ledger-bar + .stock-group {
+    border-top: 0;
+}
+
+.stock-group-head {
+    display: grid;
+    grid-template-columns: 34px minmax(0, 1fr) auto;
+    gap: 4px 16px;
+    align-items: start;
+    padding-bottom: 14px;
+}
+
+.stock-group-number {
+    padding-top: 5px;
+    font-family: var(--genrx-font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: var(--genrx-muted);
+}
+
+.stock-group-title {
+    min-width: 0;
+}
+
+.stock-group-head .pharmacy-name {
+    margin: 0;
+}
+
+.stock-group-head .section-hint {
+    padding-top: 5px;
+    text-align: right;
+}
+
+/* ---------- Listing lines ---------- */
+.stock-items {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-bottom: 1px solid var(--genrx-border);
+}
+
+.stock-line {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 84px 104px;
+    gap: 6px 18px;
+    align-items: center;
+    padding: 11px 0;
+    border-top: 1px solid var(--genrx-border);
+}
+
+.stock-line .badge,
+.stock-state {
+    width: 100%;
+    justify-self: stretch;
+}
+
+/* In-stock is the common case: a quiet marker, so the red out-of-stock
+   badge stays the thing the eye catches. */
+.stock-state {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: var(--genrx-muted);
+}
+
+.stock-state::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--genrx-success);
+}
+
+.stock-med {
+    display: grid;
+    gap: 2px;
+    min-width: 0;
+}
+
+.stock-med strong {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--genrx-ink);
+}
+
+.stock-med span {
+    font-size: 12.5px;
+    line-height: 1.45;
+    color: var(--genrx-muted);
+}
+
+.stock-price {
+    font-family: var(--genrx-font-mono);
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+    color: var(--genrx-ink-soft);
+    white-space: nowrap;
+    text-align: right;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 720px) {
+    .ledger-bar .field {
+        flex: 1 1 100%;
+        min-width: 0;
+    }
+
+    .ledger-bar-meta {
+        margin-left: 0;
+        padding-bottom: 0;
+    }
+
+    .stock-group-head {
+        grid-template-columns: 28px minmax(0, 1fr);
+    }
+
+    .stock-group-head .section-hint {
+        grid-column: 2;
+        padding-top: 6px;
+        text-align: left;
+    }
+
+    .stock-line {
+        grid-template-columns: minmax(0, 1fr) auto;
+        row-gap: 7px;
+        padding: 12px 0;
+    }
+
+    .stock-med {
+        grid-column: 1 / -1;
+    }
+}
