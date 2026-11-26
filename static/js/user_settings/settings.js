@@ -1,4 +1,4 @@
-/* Settings: preview dark mode immediately; saving still persists it. */
+/* Settings: toggle dark mode immediately and save to database via fetch. */
 (function () {
     "use strict";
 
@@ -9,36 +9,37 @@
         return;
     }
 
-    var savedTheme = document.documentElement.classList.contains("dark-mode") ? "dark" : "light";
-
-    function applyTheme(isDark, isPreview) {
+    function applyTheme(isDark) {
         document.documentElement.classList.toggle("dark-mode", isDark);
         document.body.classList.toggle("dark-mode", isDark);
 
-        if (!status) {
-            return;
-        }
-
-        if (isPreview) {
-            status.textContent = isDark
-                ? "Previewing dark mode. Save changes to keep it."
-                : "Previewing light mode. Save changes to keep it.";
-        } else {
+        if (status) {
             status.textContent = isDark ? "Saved theme: dark." : "Saved theme: light.";
         }
     }
 
     toggle.addEventListener("change", function () {
-        applyTheme(toggle.checked, true);
-    });
+        var isDark = toggle.checked;
+        applyTheme(isDark);
 
-    // Restoring a cached page must not keep an unsaved preview.
-    window.addEventListener("pageshow", function (event) {
-        if (!event.persisted) {
+        var form = toggle.closest("form");
+        if (!form) {
             return;
         }
 
-        toggle.checked = savedTheme === "dark";
-        applyTheme(savedTheme === "dark", false);
+        var formData = new FormData(form);
+        fetch(window.location.href, {
+            method: "POST",
+            body: formData,
+            headers: {
+                "X-Requested-With": "XMLHttpRequest"
+            }
+        }).then(function (response) {
+            if (response.ok) {
+                if (status) {
+                    status.textContent = isDark ? "Saved theme: dark." : "Saved theme: light.";
+                }
+            }
+        }).catch(function () {});
     });
 }());
