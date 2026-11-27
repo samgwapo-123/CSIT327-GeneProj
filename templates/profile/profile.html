@@ -4,7 +4,7 @@
 {% block title %}Profile · GeneRX{% endblock %}
 
 {% block page_css %}
-<link rel="stylesheet" href="{% static 'css/profile/profile.css' %}?v=4">
+<link rel="stylesheet" href="{% static 'css/profile/profile.css' %}?v=5">
 {% endblock %}
 
 {% block content %}
@@ -25,7 +25,13 @@
 <div class="profile-layout">
     <aside class="profile-aside" aria-label="Account summary">
         <div class="identity-block">
-            <span class="identity-avatar" aria-hidden="true">{{ request.user.username|slice:":1"|upper }}</span>
+            <div class="identity-avatar-frame">
+                {% if profile.avatar %}
+                    <img class="identity-avatar identity-avatar--photo" id="avatarPreview" src="{{ profile.avatar.url }}" alt="Your profile photo">
+                {% else %}
+                    <span class="identity-avatar" id="avatarPreview">{{ user_initial }}</span>
+                {% endif %}
+            </div>
             <p class="identity-name">@{{ request.user.username }}</p>
             <p class="identity-email">{{ request.user.email|default:"No email saved" }}</p>
         </div>
@@ -54,8 +60,24 @@
             <span class="section-hint">Not shared with pharmacies</span>
         </div>
 
-        <form method="post" class="profile-form">
+        <form method="post" enctype="multipart/form-data" class="profile-form">
             {% csrf_token %}
+
+            {% if error %}
+                <p class="alert alert-error" role="alert">{{ error }}</p>
+            {% endif %}
+
+            <div class="field">
+                <label for="avatar">Profile photo <span class="label-optional">Optional</span></label>
+                <input type="file" id="avatar" name="avatar" accept="image/jpeg,image/png,image/webp">
+                <p class="help">JPG, PNG, or WebP, up to 2 MB. Shown beside your name in the navigation bar.</p>
+                {% if profile.avatar %}
+                    <label class="checkbox-row">
+                        <input type="checkbox" name="remove_avatar">
+                        Remove the current photo
+                    </label>
+                {% endif %}
+            </div>
 
             <div class="field">
                 <label for="full_name">Full name</label>
@@ -75,4 +97,8 @@
         </form>
     </section>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'js/profile/profile.js' %}?v=1"></script>
 {% endblock %}

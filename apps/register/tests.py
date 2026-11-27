@@ -42,3 +42,12 @@ class RegisterViewTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Username already exists.")
         self.assertEqual(User.objects.filter(username="newuser").count(), 1)
+
+    def test_both_password_fields_have_reveal_buttons(self):
+        response = self.client.get(reverse("register:register"))
+        html = response.content.decode()
+
+        self.assertEqual(html.count("data-password-toggle"), 2)
+        self.assertContains(response, 'aria-controls="password"')
+        self.assertContains(response, 'aria-controls="confirm_password"')
+        self.assertContains(response, "js/shared/password-toggle.js")

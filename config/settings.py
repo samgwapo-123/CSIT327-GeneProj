@@ -71,6 +71,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'apps.user_settings.context_processors.genrx_settings',
+                'apps.user_profile.context_processors.user_avatar',
             ],
         },
     },

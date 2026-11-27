@@ -23,6 +23,16 @@
     border-bottom: 1px solid var(--genrx-border);
 }
 
+/* Fixed slot so swapping the initial for a photo never nudges the name and
+   email below it. */
+.identity-avatar-frame {
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    width: 76px;
+    height: 76px;
+}
+
 .identity-avatar {
     display: grid;
     place-items: center;
@@ -34,6 +44,37 @@
     font-family: var(--genrx-font-display);
     font-size: 24px;
     font-weight: 600;
+}
+
+/* Photo variant of the identity square: same footprint, image cropped to fit. */
+.identity-avatar--photo {
+    display: block;
+    width: 76px;
+    height: 76px;
+    padding: 0;
+    object-fit: cover;
+    border-radius: 10px;
+    border: 1px solid var(--genrx-border);
+    background: var(--genrx-subtle);
+}
+
+.field label.checkbox-row {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+    margin-top: 10px;
+    font-size: 12.5px;
+    font-weight: 500;
+    letter-spacing: 0;
+    color: var(--genrx-muted);
+    cursor: pointer;
+}
+
+.field .checkbox-row input[type="checkbox"] {
+    width: auto;
+    margin: 0;
+    accent-color: var(--genrx-accent-strong);
 }
 
 .identity-name {

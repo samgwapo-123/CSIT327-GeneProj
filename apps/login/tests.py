@@ -36,3 +36,11 @@ class LoginViewTests(TestCase):
         response = self.client.post(reverse("login:logout"))
         self.assertRedirects(response, reverse("login:login"))
         self.assertNotIn("_auth_user_id", self.client.session)
+
+    def test_password_field_has_a_reveal_button(self):
+        response = self.client.get(reverse("login:login"))
+
+        self.assertContains(response, 'data-password-toggle')
+        self.assertContains(response, 'aria-controls="password"')
+        self.assertContains(response, 'aria-label="Show password"')
+        self.assertContains(response, "js/shared/password-toggle.js")
