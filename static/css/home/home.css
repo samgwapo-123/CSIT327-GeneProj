@@ -283,6 +283,12 @@
     gap: 12px;
 }
 
+/* Wrapper for the title and subtitle; min-width lets long names wrap inside
+   the flex column instead of pushing the panel wider. */
+.detail-heading {
+    min-width: 0;
+}
+
 .back-btn {
     align-self: flex-start;
     display: inline-flex;

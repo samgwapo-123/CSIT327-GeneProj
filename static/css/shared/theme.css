@@ -198,6 +198,13 @@ img {
     flex-shrink: 0;
 }
 
+/* Groups the wordmark and tagline so the flex gap applies once; min-width
+   lets the tagline wrap on narrow screens instead of stretching the header. */
+.genrx-brand-text {
+    display: block;
+    min-width: 0;
+}
+
 .genrx-brand-name {
     display: block;
     font-family: var(--genrx-font-display);
@@ -612,6 +619,58 @@ img {
     outline: none;
     border-color: var(--genrx-accent-strong);
     box-shadow: var(--genrx-focus);
+}
+
+/* ---------- Password reveal ---------- */
+.password-field {
+    position: relative;
+}
+
+.password-field input {
+    padding-right: 46px;
+}
+
+.password-toggle {
+    position: absolute;
+    top: 50%;
+    right: 5px;
+    transform: translateY(-50%);
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    border: 0;
+    border-radius: var(--genrx-radius-sm);
+    background: transparent;
+    color: var(--genrx-muted);
+    cursor: pointer;
+}
+
+.password-toggle:hover {
+    color: var(--genrx-ink);
+    background: var(--genrx-subtle);
+}
+
+.password-toggle:focus-visible {
+    outline: 2px solid var(--genrx-accent-strong);
+    outline-offset: 1px;
+}
+
+.password-toggle svg {
+    width: 18px;
+    height: 18px;
+    pointer-events: none;
+}
+
+/* Only one glyph is visible at a time; aria-pressed drives the swap. */
+.password-toggle .icon-eye-off,
+.password-toggle.is-visible .icon-eye {
+    display: none;
+}
+
+.password-toggle.is-visible .icon-eye-off {
+    display: block;
 }
 
 .field textarea {
