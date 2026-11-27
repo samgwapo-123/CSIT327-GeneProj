@@ -11,7 +11,7 @@
 <section class="masthead masthead--compact">
     <p class="eyebrow">Account preferences</p>
     <h1 class="display-title">Set the desk the way<br>you <em>work</em>.</h1>
-    <p class="lead">Control how GeneRX looks and how your account behaves. Dark mode previews instantly; save to keep it on every page.</p>
+    <p class="lead">Control how GeneRX looks and how your account behaves. Each switch saves as soon as you change it; Save changes stores the whole form again.</p>
 </section>
 
 {% if messages %}
@@ -30,7 +30,7 @@
             <a href="#notifications"><span class="index-number">02</span> Notifications</a>
             <a href="#history"><span class="index-number">03</span> Scan history</a>
         </nav>
-        <p class="index-note">Dark mode previews immediately. Use <strong>Save changes</strong> to keep a setting.</p>
+        <p class="index-note">Both switches save immediately. Use <strong>Save changes</strong> if JavaScript is turned off.</p>
     </aside>
 
     <div class="settings-main">
@@ -104,5 +104,5 @@
 {% endblock %}
 
 {% block scripts %}
-<script src="{% static 'js/user_settings/settings.js' %}?v=4"></script>
+<script src="{% static 'js/user_settings/settings.js' %}?v=5"></script>
 {% endblock %}

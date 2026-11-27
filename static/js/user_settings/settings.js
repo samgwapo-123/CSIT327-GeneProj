@@ -1,13 +1,15 @@
-/* Settings: toggle dark mode immediately and save to database via fetch. */
+/* Settings: apply dark mode immediately and save each switch as it changes.
+   The Save changes button stays as a no-JavaScript fallback. */
 (function () {
     "use strict";
 
-    var toggle = document.getElementById("darkMode");
-    var status = document.getElementById("themeStatus");
-
-    if (!toggle) {
+    var form = document.querySelector(".settings-sheet");
+    if (!form) {
         return;
     }
+
+    var toggle = document.getElementById("darkMode");
+    var status = document.getElementById("themeStatus");
 
     function applyTheme(isDark) {
         document.documentElement.classList.toggle("dark-mode", isDark);
@@ -18,28 +20,39 @@
         }
     }
 
-    toggle.addEventListener("change", function () {
-        var isDark = toggle.checked;
-        applyTheme(isDark);
-
-        var form = toggle.closest("form");
-        if (!form) {
-            return;
-        }
-
-        var formData = new FormData(form);
+    function saveSettings() {
         fetch(window.location.href, {
             method: "POST",
-            body: formData,
+            body: new FormData(form),
             headers: {
                 "X-Requested-With": "XMLHttpRequest"
             }
         }).then(function (response) {
-            if (response.ok) {
-                if (status) {
-                    status.textContent = isDark ? "Saved theme: dark." : "Saved theme: light.";
-                }
+            if (!response.ok) {
+                return;
             }
-        }).catch(function () {});
+            if (status && toggle) {
+                status.textContent = toggle.checked
+                    ? "Saved theme: dark."
+                    : "Saved theme: light.";
+            }
+        }).catch(function () {
+            /* Keep the on-screen change; the Save button still works. */
+        });
+    }
+
+    if (toggle) {
+        toggle.addEventListener("change", function () {
+            applyTheme(toggle.checked);
+            saveSettings();
+        });
+    }
+
+    // Every other switch in the form saves the same way.
+    form.querySelectorAll('input[type="checkbox"]').forEach(function (input) {
+        if (input === toggle) {
+            return;
+        }
+        input.addEventListener("change", saveSettings);
     });
 }());
