@@ -57,6 +57,20 @@ class PharmacyListViewTests(TestCase):
 
         self.assertContains(response, "google.com/maps/dir")
         self.assertContains(response, "destination=10.310290,123.892590")
+        self.assertContains(response, "travelmode=driving")
+
+    def test_directions_fall_back_to_the_address_without_coordinates(self):
+        Pharmacy.objects.create(
+            name="No Pin Pharmacy",
+            address="123 Sample Street, Cebu City",
+            latitude="0",
+            longitude="0",
+        )
+
+        response = self.client.get(reverse("pharmacies:list"))
+
+        self.assertContains(response, "destination=123%20Sample%20Street,%20Cebu%20City")
+        self.assertNotContains(response, "destination=0,0")
 
     def test_without_a_medicine_stock_badges_are_hidden(self):
         response = self.client.get(reverse("pharmacies:list"))

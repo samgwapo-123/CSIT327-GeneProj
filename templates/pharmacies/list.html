@@ -106,9 +106,10 @@
 
                     <div class="pharmacy-actions">
                         <a class="pharmacy-directions"
-                           href="https://www.google.com/maps/dir/?api=1&amp;destination={{ row.pharmacy.latitude }},{{ row.pharmacy.longitude }}"
+                           href="{{ row.pharmacy.directions_url }}"
                            target="_blank"
-                           rel="noopener noreferrer">Directions <span aria-hidden="true">&#8599;</span></a>
+                           rel="noopener noreferrer"
+                           title="Open driving directions to {{ row.pharmacy.name }} in Google Maps">Directions <span aria-hidden="true">&#8599;</span></a>
                     </div>
                 </article>
             {% empty %}

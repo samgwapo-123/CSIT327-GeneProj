@@ -5,12 +5,14 @@ from apps.pharmacies.models import Pharmacy, PharmacyStock
 
 
 # SAMPLE DATA ONLY. These are fictional Cebu City entries for the class demo.
+# Coordinates were checked against OpenStreetMap landmarks (Nov 2026) so the
+# Google Maps directions link lands on the right building, not a random street.
 PHARMACIES = [
     {
         "name": "Chong Hua Hospital Pharmacy",
         "address": "Fuente Osmeña Circle, Cebu City",
-        "latitude": "10.310290",
-        "longitude": "123.892590",
+        "latitude": "10.310053",
+        "longitude": "123.891115",
         "contact_number": "(032) 255 8000",
         "operating_hours": "Open 24 hours",
         "stock": [
@@ -23,8 +25,8 @@ PHARMACIES = [
     {
         "name": "Cebu Doctors' University Hospital Pharmacy",
         "address": "Osmeña Boulevard, Cebu City",
-        "latitude": "10.315240",
-        "longitude": "123.889950",
+        "latitude": "10.314463",
+        "longitude": "123.891935",
         "contact_number": "(032) 255 5555",
         "operating_hours": "Open 24 hours",
         "stock": [
@@ -37,8 +39,8 @@ PHARMACIES = [
     {
         "name": "Mercury Drug - Colon",
         "address": "Colon Street, Cebu City",
-        "latitude": "10.296330",
-        "longitude": "123.903180",
+        "latitude": "10.296445",
+        "longitude": "123.898761",
         "contact_number": "(032) 253 1234",
         "operating_hours": "7:00 AM - 10:00 PM",
         "stock": [
@@ -110,8 +112,8 @@ PHARMACIES = [
     {
         "name": "Cebu City Health Office Pharmacy",
         "address": "Cebu City Health Office, Cebu City",
-        "latitude": "10.309050",
-        "longitude": "123.893130",
+        "latitude": "10.308071",
+        "longitude": "123.908957",
         "contact_number": "(032) 411 1234",
         "operating_hours": "8:00 AM - 5:00 PM",
         "stock": [

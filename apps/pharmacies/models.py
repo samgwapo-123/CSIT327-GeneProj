@@ -1,3 +1,5 @@
+from urllib.parse import quote
+
 from django.db import models
 
 
@@ -15,6 +17,30 @@ class Pharmacy(models.Model):
 
     def __str__(self):
         return self.name
+
+    @property
+    def directions_url(self):
+        """Google Maps directions to this branch.
+
+        Coordinates are the precise destination. A row saved without usable
+        coordinates falls back to its address, so the link still opens
+        somewhere sensible instead of 0,0 in the Atlantic.
+        """
+        has_coordinates = (
+            self.latitude is not None
+            and self.longitude is not None
+            and not (self.latitude == 0 and self.longitude == 0)
+        )
+
+        if has_coordinates:
+            destination = f"{self.latitude},{self.longitude}"
+        else:
+            destination = self.address or self.name
+
+        return (
+            "https://www.google.com/maps/dir/?api=1&travelmode=driving&destination="
+            + quote(destination, safe=",")
+        )
 
 
 class PharmacyStock(models.Model):
