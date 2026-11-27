@@ -4,7 +4,7 @@
 {% block title %}Pharmacies · GeneRX{% endblock %}
 
 {% block page_css %}
-<link rel="stylesheet" href="{% static 'css/pharmacies/list.css' %}?v=4">
+<link rel="stylesheet" href="{% static 'css/pharmacies/list.css' %}?v=5">
 {% endblock %}
 
 {% block content %}
@@ -44,6 +44,14 @@
             <h2 id="rail-note-title" class="rail-note-title">Before you go</h2>
             <p>Stock and hours are sample data. Phone the pharmacy to confirm before travelling.</p>
         </section>
+
+        <nav class="rail-note rail-note--links" aria-labelledby="rail-links-title">
+            <h2 id="rail-links-title" class="rail-note-title">Whole network</h2>
+            <ul class="rail-links">
+                <li><a class="text-link" href="{% url 'pharmacies:stock' %}">Stock ledger <span aria-hidden="true">&rarr;</span></a></li>
+                <li><a class="text-link" href="{% url 'pharmacies:restock' %}">Restock watch <span aria-hidden="true">&rarr;</span></a></li>
+            </ul>
+        </nav>
     </aside>
 
     <section class="locator-main" aria-labelledby="list-title">

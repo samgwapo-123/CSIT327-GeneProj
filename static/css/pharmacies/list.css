@@ -88,6 +88,23 @@
     line-height: 1.55;
 }
 
+/* Links to the ledger and restock views, kept in the same ruled rail style. */
+.rail-note--links {
+    margin-top: 18px;
+}
+
+.rail-links {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 6px;
+}
+
+.rail-links a {
+    font-size: 12.5px;
+}
+
 /* ---------- List toolbar ---------- */
 .list-toolbar {
     display: flex;

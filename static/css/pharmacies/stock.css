@@ -171,6 +171,12 @@
     text-align: right;
 }
 
+/* Empty states on the ledger and restock pages need breathing room for the
+   button that clears the filter or opens the other view. */
+.empty-action {
+    margin: 14px 0 0;
+}
+
 /* ---------- Responsive ---------- */
 @media (max-width: 720px) {
     .ledger-bar .field {
