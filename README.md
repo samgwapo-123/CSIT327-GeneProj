@@ -62,6 +62,63 @@ CSIT327-GeneProj/
 
 Each feature owns its app, template folder, and static folders. Feature apps do not import each other in Python; cross-feature lookups use string model references or `django.apps.apps.get_model()`.
 
+## Data model (ERD)
+
+Every project table sets an explicit `db_table`, so the names below match the database exactly.
+
+```text
+auth_user (Django)          profiles                 user_settings
+  id (PK)  <--- 1:1 --->  user_id (FK, unique)     user_id (FK, unique)
+  username                 full_name                dark_mode
+  email                    bio                      email_notifications
+  password
+  is_staff/is_active
+       |
+       | 1:M
+       v
+prescription_scans
+  id (PK)
+  user_id (FK -> auth_user, CASCADE)
+  matched_medicine_id (FK -> medicines, SET_NULL, nullable)
+  image_path
+  extracted_text
+  confidence_score
+  created_at
+
+medicines                        generic_alternatives
+  id (PK)  <--- 1:M --->         id (PK)
+  brand_name                     medicine_id (FK -> medicines, CASCADE)
+  generic_name                   generic_brand_name
+  dosage                         manufacturer
+  manufacturer                   price
+  rx_required
+  nti_warning
+  mdrp_price
+  created_at
+
+pharmacies                       pharmacy_stock (junction)
+  id (PK)  <--- 1:M --->         id (PK)
+  name                           pharmacy_id (FK -> pharmacies, CASCADE)
+  address                        medicine_id (FK -> medicines, CASCADE)
+  latitude                       in_stock
+  longitude                      last_updated
+  contact_number
+  operating_hours
+```
+
+Relationships in words:
+
+| Relationship | Cardinality | Notes |
+|---|---|---|
+| `auth_user` → `profiles` | 1:1 | `OneToOneField`, cascade delete |
+| `auth_user` → `user_settings` | 1:1 | `OneToOneField`, cascade delete |
+| `auth_user` → `prescription_scans` | 1:M | a user owns every scan; history filters on `request.user` |
+| `medicines` → `generic_alternatives` | 1:M | one brand medicine has many generic equivalents |
+| `medicines` ↔ `pharmacies` | M:M | resolved by the `pharmacy_stock` junction table |
+| `medicines` → `prescription_scans` | 1:M (optional) | `matched_medicine` is null until a match is saved or confirmed |
+
+Django's own tables (`auth_user`, `auth_group`, `auth_permission`, `django_content_type`, `django_admin_log`, `django_session`, `django_migrations`) are framework tables and are not redefined here.
+
 ## Setup
 
 Open PowerShell in the project folder.
@@ -103,6 +160,7 @@ Open <http://127.0.0.1:8000/>. You will be sent to the login page; create an acc
 | `ALLOWED_HOSTS` | Comma-separated hosts, e.g. `127.0.0.1,localhost`. |
 | `CSRF_TRUSTED_ORIGINS` | Comma-separated origins allowed to POST, e.g. `http://127.0.0.1:8000,http://localhost:8000`. Add a LAN origin when testing from another device. |
 | `DATABASE_URL` | Supabase PostgreSQL connection string. Leave empty to use SQLite. |
+| `DJANGO_SQLITE` | Set to `1` to force the local SQLite file even when `DATABASE_URL` is set. Use it for the test suite. |
 
 Never commit the real `.env` file. Only `.env.example` with placeholders belongs in Git.
 
