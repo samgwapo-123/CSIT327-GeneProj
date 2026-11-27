@@ -69,6 +69,13 @@
     font-size: 13.5px;
     line-height: 1.5;
     overflow-wrap: anywhere;
+    /* OCR text can be a whole page; keep each row to a scannable preview. */
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    white-space: pre-line;
 }
 
 .ledger-match {

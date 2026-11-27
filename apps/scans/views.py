@@ -1,6 +1,8 @@
 import os
 from decimal import Decimal
 
+from PIL import Image, UnidentifiedImageError
+
 from django.apps import apps as django_apps
 from django.conf import settings
 from django.contrib import messages
@@ -11,9 +13,9 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.views.decorators.http import require_POST
 
-from .matching import find_best_match, match_status
+from .matching import find_best_match, find_best_match_in_text, match_status
 from .models import PrescriptionScan
-from .ocr import extract_text
+from .ocr import extract_text, ocr_installed
 
 
 @login_required
@@ -45,6 +47,18 @@ def _validate_image(upload):
 
     if upload.size > MAX_IMAGE_BYTES:
         return "The image is larger than 5 MB. Choose a smaller file."
+
+    try:
+        # Extension and content type are both client-supplied. Reading the
+        # signature stops a renamed text file from being stored and then
+        # failing OCR with no explanation.
+        with Image.open(upload) as image:
+            image.verify()
+    except (UnidentifiedImageError, OSError, ValueError, Image.DecompressionBombError):
+        return "That file could not be read as an image. Try another photo."
+    finally:
+        # verify() consumes the stream; rewind so the saved file is complete.
+        upload.seek(0)
 
     return ""
 
@@ -85,41 +99,61 @@ def scan_view(request):
                 error = image_error
             else:
                 image_path = _save_image(image) if image else ""
-                extracted_text = (
+                ocr_text = (
                     extract_text(os.path.join(settings.MEDIA_ROOT, image_path))
                     if image_path else ""
                 )
 
-                # A typed name is more reliable than the placeholder OCR today.
-                matching_text = typed_value or extracted_text
+                # A typed name still wins: it is the user's own correction of
+                # whatever the photo says.
+                if typed_value:
+                    medicine, confidence = find_best_match(typed_value)
+                    matched_text = typed_value
+                elif ocr_text:
+                    medicine, confidence, matched_text = find_best_match_in_text(ocr_text)
+                else:
+                    medicine, confidence, matched_text = None, 0.0, ""
 
-                if not matching_text:
+                stored_text = ocr_text or typed_value
+
+                if not matched_text:
                     # Keep the upload in history so the user can see it was stored.
                     scan = PrescriptionScan.objects.create(
                         user=request.user,
                         image_path=image_path,
-                        extracted_text="",
-                        confidence_score=Decimal("0.00"),
+                        extracted_text=stored_text,
+                        confidence_score=Decimal(str(round(confidence, 2))),
                     )
+
+                    if ocr_text:
+                        message = (
+                            "Text was read from the image, but no medicine name was "
+                            "close enough. Check the extracted text below or type the "
+                            "brand name yourself."
+                        )
+                    else:
+                        message = (
+                            "The image was saved, but no readable text was found. "
+                            "Try a brighter, closer photo of the printed label, or "
+                            "type the medicine name."
+                        )
+
                     result = {
                         "status": "manual",
-                        "confidence": 0.0,
+                        "confidence": confidence,
                         "medicine": None,
                         "scan": scan,
                         "image_url": _image_url(image_path),
-                        "message": (
-                            "The image was saved, but OCR is not connected yet, so no text "
-                            "was read. Type the medicine name to get a match."
-                        ),
+                        "extracted_text": ocr_text,
+                        "message": message,
                     }
                 else:
-                    medicine, confidence = find_best_match(matching_text)
                     status = match_status(confidence)
 
                     scan = PrescriptionScan.objects.create(
                         user=request.user,
                         image_path=image_path,
-                        extracted_text=matching_text,
+                        extracted_text=stored_text,
                         confidence_score=Decimal(str(round(confidence, 2))),
                         # Only a high-confidence match is saved as final.
                         matched_medicine=medicine if status == "matched" else None,
@@ -131,6 +165,9 @@ def scan_view(request):
                         "medicine": medicine,
                         "scan": scan,
                         "image_url": _image_url(image_path),
+                        "extracted_text": ocr_text,
+                        "matched_text": matched_text,
+                        "typed": bool(typed_value),
                     }
 
                     if status == "matched":
@@ -140,6 +177,7 @@ def scan_view(request):
         "result": result,
         "error": error,
         "typed_value": typed_value,
+        "ocr_installed": ocr_installed(),
     })
 
 

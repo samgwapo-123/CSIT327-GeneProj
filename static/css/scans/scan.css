@@ -217,6 +217,38 @@
     font-size: 12px;
 }
 
+/* Text the OCR engine read, kept beside the result so a wrong match is easy
+   to explain: the user can see exactly which words were recognised. */
+.scan-extracted {
+    margin-top: 20px;
+    padding: 12px 14px;
+    border: 1px solid var(--genrx-border);
+    border-left: 3px solid var(--genrx-accent);
+    border-radius: var(--genrx-radius-sm);
+    background: var(--genrx-subtle);
+}
+
+.scan-extracted-label {
+    margin: 0 0 6px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--genrx-muted);
+}
+
+.scan-extracted-text {
+    margin: 0;
+    max-height: 160px;
+    overflow: auto;
+    font-family: var(--genrx-font-mono);
+    font-size: 12.5px;
+    line-height: 1.6;
+    color: var(--genrx-ink-soft);
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
 /* ---------- Confidence guide ---------- */
 .aside-title {
     margin: 8px 0 18px;

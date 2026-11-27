@@ -4,19 +4,25 @@
 {% block title %}Scan medicine · GeneRX{% endblock %}
 
 {% block page_css %}
-<link rel="stylesheet" href="{% static 'css/scans/scan.css' %}?v=4">
+<link rel="stylesheet" href="{% static 'css/scans/scan.css' %}?v=5">
 {% endblock %}
 
 {% block content %}
 <section class="masthead masthead--compact">
     <p class="eyebrow">Prescription intake</p>
     <h1 class="display-title">Type it, or upload<br>the <em>label</em>.</h1>
-    <p class="lead">Upload a prescription photo and/or type the medicine name. We match it against the sample medicine list and show how confident the match is.</p>
+    <p class="lead">Upload a photo of the printed label and GeneRX reads the text, finds the medicine, and shows how confident the match is. Typing the name still works when a photo is unclear.</p>
 </section>
 
+{% if not ocr_installed %}
 <p class="alert alert-warning">
-    <strong>No real OCR yet.</strong> The image is stored but no text is read from it. Typing the name is what produces a match.
+    <strong>OCR package missing.</strong> Install the scan requirements, then restart the server: <code>pip install -r requirements.txt</code>.
 </p>
+{% else %}
+<p class="alert alert-info">
+    Printed labels and clear photos read best. Handwritten prescriptions are not supported, so type the name if the photo is hard to read.
+</p>
+{% endif %}
 
 {% if messages %}
     <div class="message-list">
@@ -144,10 +150,17 @@
                     </div>
                 {% endif %}
 
+                {% if result.extracted_text %}
+                    <div class="scan-extracted">
+                        <p class="scan-extracted-label">Text read from the image</p>
+                        <pre class="scan-extracted-text">{{ result.extracted_text }}</pre>
+                    </div>
+                {% endif %}
+
                 {% if result.image_url %}
                     <figure class="scan-preview">
                         <img src="{{ result.image_url }}" alt="Uploaded prescription image">
-                        <figcaption>Stored under your account. OCR is not reading this image yet.</figcaption>
+                        <figcaption>Stored under your account. Only you can see this image.</figcaption>
                     </figure>
                 {% endif %}
             </section>
@@ -180,7 +193,7 @@
                 </div>
             </li>
         </ol>
-        <p class="aside-footnote">OCR is not connected in this build, so the typed medicine name does all the work.</p>
+        <p class="aside-footnote">OCR runs on this server with RapidOCR. Printed labels read best; handwriting is not supported, so type the name when the photo is unclear.</p>
     </aside>
 </div>
 {% endblock %}

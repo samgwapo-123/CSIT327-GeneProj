@@ -9,3 +9,14 @@ dj-database-url>=2.1
 
 # Loads .env into os.environ during local development.
 python-dotenv>=1.0
+
+# Image handling: required by Profile.avatar (ImageField) and by the OCR
+# pipeline that reads uploaded prescriptions.
+Pillow>=10.0
+
+# Real OCR for prescription photos. The models ship inside the wheel, so no
+# external Tesseract install is needed.
+rapidocr>=3.0
+# Inference backend RapidOCR calls into. Listed explicitly because the rapidocr
+# wheel does not expose an onnxruntime extra.
+onnxruntime>=1.20

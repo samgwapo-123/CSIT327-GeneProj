@@ -5,14 +5,14 @@
 {% block title %}Scan history · GeneRX{% endblock %}
 
 {% block page_css %}
-<link rel="stylesheet" href="{% static 'css/scans/history.css' %}?v=4">
+<link rel="stylesheet" href="{% static 'css/scans/history.css' %}?v=5">
 {% endblock %}
 
 {% block content %}
 <section class="masthead masthead--compact">
     <p class="eyebrow">Private ledger</p>
     <h1 class="display-title">Every scan, on<br>the <em>record</em>.</h1>
-    <p class="lead">Only your own scans appear here, newest first. Each row keeps the typed text, the saved match, and the confidence score.</p>
+    <p class="lead">Only your own scans appear here, newest first. Each row keeps the text that was read or typed, the saved match, and the confidence score.</p>
 </section>
 
 {% if scans %}
@@ -27,7 +27,7 @@
     <div class="ledger" role="table" aria-label="Scan history">
         <div class="ledger-head" role="row">
             <span role="columnheader">Date</span>
-            <span role="columnheader">Typed input</span>
+            <span role="columnheader">Read or typed text</span>
             <span role="columnheader">Matched medicine</span>
             <span role="columnheader">Confidence</span>
             <span role="columnheader">Actions</span>
@@ -40,7 +40,7 @@
                     <span>{{ scan.created_at|date:"g:i A" }}</span>
                 </div>
 
-                <div class="ledger-cell" role="cell" data-label="Typed input">
+                <div class="ledger-cell" role="cell" data-label="Read or typed text">
                     <p class="ledger-input">{{ scan.extracted_text|default:"No text entered" }}</p>
                 </div>
 
