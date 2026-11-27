@@ -7,15 +7,17 @@ The app uses plain Django function-based views, Django templates, and small vani
 ## What works
 
 - Register, log in, log out, edit a profile, and save settings.
+- Show or hide the password on the login and registration forms.
+- Upload a profile photo; it replaces the initial in the navigation bar and survives logout and login.
 - Search medicines by brand or generic name through JSON endpoints.
 - View generic alternatives with sample prices.
 - Filter a pharmacy list by medicine and see sample stock.
 - Browse the whole stock ledger (`/pharmacies/stock/`): one JOIN query pairs every stock row with its pharmacy and medicine.
 - Check the restock watch (`/pharmacies/restock/`): a SUBQUERY lists only the pharmacies with an out-of-stock item, and shows which medicine.
 - Sort pharmacies A-Z or nearest-first with browser geolocation.
-- Open Google Maps directions from a pharmacy's latitude and longitude.
-- Upload a prescription image (JPG, PNG, WebP, max 5 MB) and/or type a medicine name.
-- Match a typed name with `difflib`, confirm medium-confidence matches, and save scan history.
+- Open Google Maps driving directions from each pharmacy's verified coordinates.
+- Upload a prescription image (JPG, PNG, WebP, max 5 MB) and read the printed text with real OCR (RapidOCR), with or without a typed name.
+- Match a name with `difflib`, confirm medium-confidence matches, and save scan history.
 - Toggle dark mode across the signed-in pages.
 - Seed the database with repeatable sample medicines and pharmacies.
 
@@ -25,6 +27,8 @@ The app uses plain Django function-based views, Django templates, and small vani
 - PostgreSQL on Supabase through `DATABASE_URL`
 - SQLite fallback when `DATABASE_URL` is empty
 - `python-dotenv` for local `.env` loading
+- Pillow for image validation and profile photos
+- RapidOCR (ONNX Runtime) for prescription text extraction, models bundled in the wheel
 - HTML templates, CSS, and vanilla JavaScript
 
 ## Project structure
@@ -71,7 +75,7 @@ auth_user (Django)          profiles                 user_settings
   id (PK)  <--- 1:1 --->  user_id (FK, unique)     user_id (FK, unique)
   username                 full_name                dark_mode
   email                    bio                      email_notifications
-  password
+  password                 avatar (image path)
   is_staff/is_active
        |
        | 1:M
@@ -212,11 +216,20 @@ $env:DJANGO_SQLITE="1"; python manage.py test apps.pharmacies
 ## How a scan flows
 
 1. `apps/scans/views.py` accepts `multipart/form-data`.
-2. The image is checked for extension, content type, and size, then saved with `FileSystemStorage` under `MEDIA_ROOT/scans`.
-3. `extract_text()` is a placeholder that returns `""` with a TODO. The UI says this honestly.
-4. `find_best_match()` compares the typed name (or future OCR text) against every brand and generic name with `difflib.SequenceMatcher`.
-5. Confidence above 90 saves the match; 70-90 asks for confirmation; below 70 asks for manual entry.
+2. The image is checked for extension, content type, size, and a real image signature (Pillow), then saved with `FileSystemStorage` under `MEDIA_ROOT/scans`. A renamed text file is rejected before anything is written.
+3. `apps/scans/ocr.py` reads the printed text with RapidOCR. The engine is built once per process and the models ship inside the package, so no Tesseract install is needed. Corrupt uploads are rejected before the models load.
+4. A typed name is matched with `find_best_match()`. Without one, `find_best_match_in_text()` slides one-to-three-word windows over the OCR text, so a whole prescription page ("Dr. Santos … Coumadin 5 mg …") still finds the medicine inside it.
+5. Confidence above 90 saves the match; 70-90 asks for confirmation; below 70 asks for manual entry. The recognised text is shown on the result card so a wrong match is easy to explain.
 6. Every attempt creates a `PrescriptionScan` row, and history is filtered to `request.user`.
+
+## Profile photos
+
+`apps/user_profile/models.py` stores `Profile.avatar` as an `ImageField`; files land in `MEDIA_ROOT/avatars/<year>/<month>/`.
+
+- Uploads are limited to JPG, PNG, or WebP, 2 MB, and 40 megapixels.
+- Pillow verifies the file signature before it is saved, so renaming a text file to `.png` is rejected.
+- Replacing a photo deletes the previous file, and "Remove the current photo" clears both the row and the file.
+- The navigation bar reads the stored path through `apps/user_profile/context_processors.py`, which is why the photo survives logout and login.
 
 ## JOIN and SUBQUERY implementation
 
@@ -276,13 +289,13 @@ All medicines, prices, pharmacies, coordinates, operating hours, and stock rows 
 
 ## Limitations
 
-- **No real OCR.** `extract_text()` returns an empty string. Images are stored but not read. Typing the name is what produces a match.
-- **No live data.** Medicine prices, pharmacy locations, stock, and hours are sample rows.
-- **No embedded map.** "Get directions" opens a Google Maps URL. The nearest-first sort uses straight-line distance from browser geolocation, not road distance.
+- **OCR is not perfect.** RapidOCR reads printed labels well, but handwriting, glare, and very small print can fail. The recognised text is shown so the user can see what was read and type the name instead.
+- **No live data.** Medicine prices, pharmacy locations, stock, and hours are sample rows. Coordinates were checked against OpenStreetMap landmarks, but the pharmacies themselves are fictional.
+- **No embedded map.** "Directions" opens a Google Maps driving route to the stored coordinates, falling back to the address when a row has no usable coordinates. The nearest-first sort uses straight-line distance from browser geolocation, not road distance.
 - **No email delivery.** The email toggle is saved only; no message is sent or queued.
 - **No offline mode.** There is no service worker or PWA cache.
 - **English only.** No translations or locale switching.
-- **Development media serving.** Django serves `/media/` only while `DEBUG=True`. Production needs a web server or object storage.
+- **Development media serving.** Django serves `/media/` only while `DEBUG=True`, so scan images and profile photos need a web server or object storage in production.
 - **No password reset or email verification.** Registration creates the account immediately.
 - **No pagination.** Scan history renders every row for the current user.
 - **Not medical advice.** The project is for demonstration, not clinical use.
