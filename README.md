@@ -68,46 +68,89 @@ Each feature owns its app, template folder, and static folders. Feature apps do 
 
 ## Data model (ERD)
 
-Every project table sets an explicit `db_table`, so the names below match the database exactly.
+The diagram is Mermaid UML, so GitHub and VS Code render it as a real ER diagram instead of ASCII art. Entity names are the exact `db_table` values every model sets explicitly.
 
-```text
-auth_user (Django)          profiles                 user_settings
-  id (PK)  <--- 1:1 --->  user_id (FK, unique)     user_id (FK, unique)
-  username                 full_name                dark_mode
-  email                    bio                      email_notifications
-  password                 avatar (image path)
-  is_staff/is_active
-       |
-       | 1:M
-       v
-prescription_scans
-  id (PK)
-  user_id (FK -> auth_user, CASCADE)
-  matched_medicine_id (FK -> medicines, SET_NULL, nullable)
-  image_path
-  extracted_text
-  confidence_score
-  created_at
+```mermaid
+erDiagram
+    auth_user ||--|| profiles : "has one"
+    auth_user ||--|| user_settings : "has one"
+    auth_user ||--o{ prescription_scans : "owns"
+    medicines ||--o{ generic_alternatives : "has generics"
+    medicines ||--o{ pharmacy_stock : "stocked as"
+    pharmacies ||--o{ pharmacy_stock : "carries"
+    medicines |o--o{ prescription_scans : "matched in"
 
-medicines                        generic_alternatives
-  id (PK)  <--- 1:M --->         id (PK)
-  brand_name                     medicine_id (FK -> medicines, CASCADE)
-  generic_name                   generic_brand_name
-  dosage                         manufacturer
-  manufacturer                   price
-  rx_required
-  nti_warning
-  mdrp_price
-  created_at
+    auth_user {
+        int id PK
+        string username "unique"
+        string email
+        string password
+        bool is_staff
+        bool is_active
+    }
 
-pharmacies                       pharmacy_stock (junction)
-  id (PK)  <--- 1:M --->         id (PK)
-  name                           pharmacy_id (FK -> pharmacies, CASCADE)
-  address                        medicine_id (FK -> medicines, CASCADE)
-  latitude                       in_stock
-  longitude                      last_updated
-  contact_number
-  operating_hours
+    profiles {
+        int id PK
+        int user_id FK "unique, cascades"
+        string full_name
+        text bio
+        string avatar "image path"
+    }
+
+    user_settings {
+        int id PK
+        int user_id FK "unique, cascades"
+        bool dark_mode
+        bool email_notifications
+    }
+
+    prescription_scans {
+        int id PK
+        int user_id FK "cascades"
+        int matched_medicine_id FK "nullable, set null"
+        string image_path
+        text extracted_text
+        decimal confidence_score
+        datetime created_at
+    }
+
+    medicines {
+        int id PK
+        string brand_name
+        string generic_name
+        string dosage
+        string manufacturer
+        bool rx_required
+        bool nti_warning
+        decimal mdrp_price
+        datetime created_at
+    }
+
+    generic_alternatives {
+        int id PK
+        int medicine_id FK "cascades"
+        string generic_brand_name
+        string manufacturer
+        decimal price
+    }
+
+    pharmacies {
+        int id PK
+        string name
+        string address
+        decimal latitude
+        decimal longitude
+        string contact_number
+        string operating_hours
+    }
+
+    pharmacy_stock {
+        int id PK
+        int pharmacy_id FK "cascades"
+        int medicine_id FK "cascades"
+        bool in_stock
+        datetime last_updated
+    }
 ```
 
 Relationships in words:
