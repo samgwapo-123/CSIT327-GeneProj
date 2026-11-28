@@ -278,22 +278,32 @@ img {
     flex-shrink: 0;
 }
 
-/* The avatar is a link now, so undo the generic nav-link padding and let the
-   photo fill the square. The extra specificity also keeps the initial letter
-   readable on the accent background. */
-.genrx-nav .genrx-avatar {
+/* The avatar is a link, so it has to beat the generic `.genrx-nav a` rule,
+   which sets a transparent background and the muted link colour. Matching the
+   element in the selector (a.genrx-avatar) is what keeps the accent tile and
+   the white initial visible instead of a white letter on the page. */
+.genrx-nav a.genrx-avatar {
     width: 32px;
     height: 32px;
     padding: 0;
     border-radius: 8px;
     overflow: hidden;
+    background: var(--genrx-accent);
     color: var(--genrx-on-accent);
+    display: grid;
+    place-items: center;
+    font-size: 12px;
+    font-weight: 700;
     text-decoration: none;
+    /* Keep the avatar pinned to the right edge of the bar even when the nav
+       wraps onto a second row on narrow screens. */
+    margin-left: auto;
 }
 
-.genrx-nav .genrx-avatar:hover {
+.genrx-nav a.genrx-avatar:hover {
     background: var(--genrx-accent-strong);
     color: var(--genrx-on-accent);
+    text-decoration: none;
 }
 
 .genrx-avatar img {
@@ -304,6 +314,7 @@ img {
 }
 
 .genrx-nav a.genrx-avatar.is-current {
+    background: var(--genrx-accent);
     box-shadow: 0 0 0 2px var(--genrx-surface), 0 0 0 4px var(--genrx-accent-strong);
     color: var(--genrx-on-accent);
     text-decoration: none;
